@@ -1,10 +1,10 @@
-package org.example.backend;
+package com.ftnteam11_2025.pki.pki_system;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BackendApplicationTests {
+class PkiSystemApplicationTests {
 
 	@Test
 	void contextLoads() {

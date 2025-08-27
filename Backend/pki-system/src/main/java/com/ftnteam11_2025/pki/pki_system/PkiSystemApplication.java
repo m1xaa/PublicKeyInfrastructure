@@ -1,13 +1,13 @@
-package org.example.backend;
+package com.ftnteam11_2025.pki.pki_system;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BackendApplication {
+public class PkiSystemApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BackendApplication.class, args);
+		SpringApplication.run(PkiSystemApplication.class, args);
 	}
 
 }
