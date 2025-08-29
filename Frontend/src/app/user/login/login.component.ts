@@ -53,7 +53,7 @@ export class LoginComponent {
         .subscribe({
           next: () => {
             this.toastr.success("You've successfully logged in!", 'Success');
-            this.router.navigateByUrl('/user/login');
+            this.router.navigateByUrl('/');
           },
           error: (err: ErrorResponse) => {
             this.toastr.error(err.message, 'Oops!');
