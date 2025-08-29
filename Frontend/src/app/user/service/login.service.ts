@@ -16,6 +16,12 @@ export class LoginService {
     private httpClient: HttpClient
   ) {}
 
+  testLogin(): Observable<LoginResponse> {
+    return this.httpClient.get<LoginResponse>(
+      environment.apiHost + '/api/user/test'
+    );
+  }
+
   login(email: string, password: string): Observable<void> {
     return this.httpClient
       .post<LoginResponse>(environment.apiHost + '/api/user/login', {
@@ -23,7 +29,7 @@ export class LoginService {
         password,
       })
       .pipe(
-        tap((response) => {
+        tap((response: LoginResponse) => {
           const user: User = {
             userId: response.userId,
             email: response.email,
@@ -33,6 +39,9 @@ export class LoginService {
           };
           this.authService.setJwt(response.jwt);
           this.authService.setUser(user);
+          this.authService.setRefreshToken(response.refreshToken);
+          console.log(response.jwt);
+          console.log(response.refreshToken);
         }),
         catchError(this.handleError),
         map(() => void 0)

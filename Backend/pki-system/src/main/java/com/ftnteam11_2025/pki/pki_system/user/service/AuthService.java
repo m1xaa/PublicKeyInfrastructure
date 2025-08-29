@@ -2,6 +2,8 @@ package com.ftnteam11_2025.pki.pki_system.user.service;
 
 import com.ftnteam11_2025.pki.pki_system.email.service.EmailService;
 import com.ftnteam11_2025.pki.pki_system.security.jwt.JwtService;
+import com.ftnteam11_2025.pki.pki_system.security.refresh.model.RefreshToken;
+import com.ftnteam11_2025.pki.pki_system.security.refresh.service.RefreshTokenService;
 import com.ftnteam11_2025.pki.pki_system.security.user.UserDetailsImpl;
 import com.ftnteam11_2025.pki.pki_system.user.dto.*;
 import com.ftnteam11_2025.pki.pki_system.user.model.Account;
@@ -24,7 +26,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     public RegisterResponseDTO register(@Valid RegisterRequestDTO registerRequestDTO) {
         if(accountRepository.existsByEmail(registerRequestDTO.getEmail())) {
@@ -118,6 +120,7 @@ public class AuthService {
             User user = userRepository.findById(userDetails.getUserId()).orElseThrow(()-> new UnauthenticatedError("Invalid credentials"));
 
             String jwt = jwtService.generateToken(userDetails);
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
             return new LoginResponseDTO(
                     userDetails.getUserId(),
                     userDetails.getUsername(),
@@ -125,7 +128,7 @@ public class AuthService {
                     user.getLastName(),
                     userDetails.getUserRole(),
                     jwt,
-                    null
+                    refreshToken.getToken()
             );
         }catch (DisabledException e) {
             throw new UnauthenticatedError("Account has been deactivated");

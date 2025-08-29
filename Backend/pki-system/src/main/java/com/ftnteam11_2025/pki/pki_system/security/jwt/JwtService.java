@@ -59,7 +59,7 @@ public class JwtService {
 
     public String getToken(HttpServletRequest request){
         final String header = request.getHeader(AUTH_HEADER);
-        if(header != null && !header.startsWith(HEADER_PREFIX)){
+        if(header != null && header.startsWith(HEADER_PREFIX)){
             return header.substring(HEADER_PREFIX.length());
         }
         return null;

@@ -2,13 +2,23 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { UserRole } from '../auth/model/user-role.model';
 import { User } from '../auth/model/user.mode';
+import { HttpClient } from '@angular/common/http';
+import { RefreshTokenResponse } from '../auth/model/refresh-token.response';
+import { environment } from '../../environment/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  constructor(private httpClient: HttpClient) {}
+
   private user = new BehaviorSubject<User | null>(this.getStoredUser());
-  private token = new BehaviorSubject<string | null>(this.getStoredToken());
+  private jwtToken = new BehaviorSubject<string | null>(
+    this.getStoredJwtToken()
+  );
+  private refreshToken = new BehaviorSubject<string | null>(
+    this.getStoredRefreshTokenToken()
+  );
 
   user$: Observable<User | null> = this.user.asObservable();
 
@@ -40,7 +50,11 @@ export class AuthService {
   }
 
   getJwt(): string | null {
-    return this.token.getValue();
+    return this.jwtToken.getValue();
+  }
+
+  getRefreshToken(): string | null {
+    return this.refreshToken.getValue();
   }
 
   setJwt(token: string | null) {
@@ -49,15 +63,38 @@ export class AuthService {
     } else {
       localStorage.removeItem('jwt');
     }
-    this.token.next(token);
+    this.jwtToken.next(token);
   }
 
-  private getStoredToken(): string | null {
+  setRefreshToken(token: string | null) {
+    if (token) {
+      localStorage.setItem('refreshToken', token);
+    } else {
+      localStorage.removeItem('refreshToken');
+    }
+    this.refreshToken.next(token);
+  }
+
+  private getStoredJwtToken(): string | null {
     return localStorage.getItem('jwt');
+  }
+
+  private getStoredRefreshTokenToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
+  refreshJwt(refreshToken: string) {
+    return this.httpClient.post<RefreshTokenResponse>(
+      environment.apiHost + '/api/refresh',
+      {
+        refreshToken,
+      }
+    );
   }
 
   logOut() {
     this.setUser(null);
     this.setJwt(null);
+    this.setRefreshToken(null);
   }
 }

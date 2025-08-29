@@ -3,3 +3,4 @@ security:
     - path: /api/user/register
     - path: /api/user/activate
     - path: /api/user/login
+    - path: /api/refresh
