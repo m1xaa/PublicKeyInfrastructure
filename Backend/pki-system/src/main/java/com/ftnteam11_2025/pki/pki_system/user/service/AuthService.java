@@ -1,25 +1,34 @@
 package com.ftnteam11_2025.pki.pki_system.user.service;
 
 import com.ftnteam11_2025.pki.pki_system.email.service.EmailService;
-import com.ftnteam11_2025.pki.pki_system.user.dto.RegisterRequestDTO;
-import com.ftnteam11_2025.pki.pki_system.user.dto.RegisterResponseDTO;
-import com.ftnteam11_2025.pki.pki_system.user.dto.VerificationCodeDTO;
+import com.ftnteam11_2025.pki.pki_system.security.jwt.JwtService;
+import com.ftnteam11_2025.pki.pki_system.security.user.UserDetailsImpl;
+import com.ftnteam11_2025.pki.pki_system.user.dto.*;
 import com.ftnteam11_2025.pki.pki_system.user.model.Account;
 import com.ftnteam11_2025.pki.pki_system.user.model.AccountStatus;
 import com.ftnteam11_2025.pki.pki_system.user.model.RegistrationRequest;
 import com.ftnteam11_2025.pki.pki_system.user.model.User;
 import com.ftnteam11_2025.pki.pki_system.user.repository.AccountRepository;
 import com.ftnteam11_2025.pki.pki_system.user.repository.RegistrationRequestRepository;
+import com.ftnteam11_2025.pki.pki_system.user.repository.UserRepository;
 import com.ftnteam11_2025.pki.pki_system.util.VerificationCodeGenerator;
 import com.ftnteam11_2025.pki.pki_system.util.exception.InvalidRequestError;
 import com.ftnteam11_2025.pki.pki_system.util.exception.NotFoundError;
+import com.ftnteam11_2025.pki.pki_system.util.exception.UnauthenticatedError;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -37,6 +46,9 @@ public class AuthService {
     private Duration activationTimeLimit;
     private final RegistrationRequestRepository registrationRequestRepository;
     private final EmailService emailService;
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     public RegisterResponseDTO register(@Valid RegisterRequestDTO registerRequestDTO) {
         if(accountRepository.existsByEmail(registerRequestDTO.getEmail())) {
@@ -92,5 +104,35 @@ public class AuthService {
 
         accountRepository.save(account);
         registrationRequestRepository.delete(registrationRequest);
+    }
+
+    public LoginResponseDTO login(@Valid LoginRequestDTO loginRequestDTO) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+
+        try {
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            UserDetailsImpl  userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(()-> new UnauthenticatedError("Invalid credentials"));
+
+            String jwt = jwtService.generateToken(userDetails);
+            return new LoginResponseDTO(
+                    userDetails.getUserId(),
+                    userDetails.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    userDetails.getUserRole(),
+                    jwt,
+                    null
+            );
+        }catch (DisabledException e) {
+            throw new UnauthenticatedError("Account has been deactivated");
+        } catch (BadCredentialsException e) {
+            throw new UnauthenticatedError("Invalid credentials");
+        } catch (AuthenticationException e) {
+            throw new UnauthenticatedError(e.getMessage());
+        }
     }
 }

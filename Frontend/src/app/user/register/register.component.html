@@ -181,8 +181,9 @@
                 id="password"
                 name="password"
                 formControlName="password"
-                minlength="4"
+                minlength="8"
                 required
+                autocomplete="new-password"
                 class="peer block w-full rounded-t-lg px-2.5 pb-2.5 pt-5 text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent"
               />
               <label
@@ -265,8 +266,9 @@
                 id="confirmPassword"
                 name="confirmPassword"
                 formControlName="confirmPassword"
-                minlength="4"
+                minlength="8"
                 required
+                autocomplete="new-password"
                 class="peer block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent"
               />
               <label
@@ -345,7 +347,7 @@
           <p class="text-sm font-light text-white">
             Already have an account?
             <a
-              href="/login"
+              routerLink="/user/login"
               class="font-medium text-secondary-400 hover:underline"
               >Login here</a
             >

@@ -41,12 +41,13 @@
           Your email has been successfully verified.
         </p>
         <div class="flex justify-center gap-4">
-          <a routerLink="/user/login" class="button bg-secondary-400"
-            >Go to Login</a
-          >
+          <button routerLink="/user/login" class="bg-secondary-400">
+            Go to Login
+          </button>
         </div>
       </div>
 
+      <!--Error State-->
       <div *ngIf="verificationStatus === 'error'" class="text-center">
         <div class="text-red-500 mb-4">
           <svg
@@ -65,6 +66,11 @@
         <h3 class="text-xl font-semibold text-gray-800 mb-2">
           Verification Failed
         </h3>
+        <a
+          routerLink="/user/register"
+          class="font-medium text-secondary-400 hover:underline"
+          >Sign up</a
+        >
         <p class="text-gray-600">{{ errorMessage }}</p>
       </div>
     </div>

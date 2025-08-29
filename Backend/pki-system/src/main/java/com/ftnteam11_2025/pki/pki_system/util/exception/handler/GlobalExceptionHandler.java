@@ -1,6 +1,7 @@
 package com.ftnteam11_2025.pki.pki_system.util.exception.handler;
 
 import com.ftnteam11_2025.pki.pki_system.util.dto.ErrorResponseDTO;
+import com.ftnteam11_2025.pki.pki_system.util.exception.UnauthenticatedError;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.NonNull;
@@ -37,6 +38,16 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(UnauthenticatedError.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthenticatedError(UnauthenticatedError ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of(
+                        "message", ex.getMessage(),
+                        "code", 401
+                ));
+    }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
