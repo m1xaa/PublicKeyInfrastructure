@@ -1,40 +1,46 @@
-package com.ftnteam11_2025.pki.pki_system.user.model;
+    package com.ftnteam11_2025.pki.pki_system.user.model;
 
-import com.ftnteam11_2025.pki.pki_system.util.ValidationPatterns;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
+    import com.ftnteam11_2025.pki.pki_system.security.refresh.model.RefreshToken;
+    import com.ftnteam11_2025.pki.pki_system.util.ValidationPatterns;
+    import jakarta.persistence.*;
+    import jakarta.validation.constraints.NotNull;
+    import jakarta.validation.constraints.Pattern;
+    import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Entity
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    import java.util.List;
 
-    @NotNull(message = "First name is required")
-    @Column(nullable = false)
-    private String firstName;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Entity
+    @Table(name = "users")
+    public class User {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @NotNull(message = "Last name is required")
-    @Column(nullable = false)
-    private String lastName;
+        @NotNull(message = "First name is required")
+        @Column(nullable = false)
+        private String firstName;
 
-    @NotNull(message = "Organization name is required")
-    @Column(nullable = false)
-    private String organizationName;
+        @NotNull(message = "Last name is required")
+        @Column(nullable = false)
+        private String lastName;
 
-    @NotNull(message = "Role is required")
-    @Column(nullable = false)
-    private UserRole role;
+        @NotNull(message = "Organization name is required")
+        @Column(nullable = false)
+        private String organizationName;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(unique = true)
-    private Account account;
-}
+        @NotNull(message = "Role is required")
+        @Column(nullable = false)
+        private UserRole role;
+
+        @OneToOne(fetch = FetchType.LAZY)
+        @JoinColumn(unique = true)
+        private Account account;
+
+        @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+        private List<RefreshToken>  refreshTokens;
+    }
