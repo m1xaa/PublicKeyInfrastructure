@@ -2,10 +2,7 @@ package com.ftnteam11_2025.pki.pki_system.certificates.service.impl;
 
 import org.springframework.stereotype.Component;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -26,12 +23,26 @@ public class KeyStoreWriter {
 
     public void loadKeyStore(String fileName, char[] password) {
         try {
-            if(fileName != null) {
-                keyStore.load(new FileInputStream(fileName), password);
-            } else {
+            File ksFile = new File(fileName);
 
-                keyStore.load(null, password);
+            File parentDir = ksFile.getParentFile();
+            if (!parentDir.exists()) {
+                parentDir.mkdirs();
             }
+
+            if (ksFile.exists()) {
+                try (FileInputStream fis = new FileInputStream(ksFile)) {
+                    keyStore.load(fis, password);
+                }
+            } else {
+                keyStore.load(null, password);
+                try (FileOutputStream fos = new FileOutputStream(ksFile)) {
+                    keyStore.store(fos, password);
+                } catch (KeyStoreException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (CertificateException e) {

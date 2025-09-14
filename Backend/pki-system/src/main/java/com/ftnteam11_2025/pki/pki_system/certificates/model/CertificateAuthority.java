@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -13,10 +14,13 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Table(name = "certificates")
 public class CertificateAuthority {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "UUID")
+    @Column(updatable = false, nullable = false)
     private UUID id;
 
     @NotNull
@@ -26,10 +30,10 @@ public class CertificateAuthority {
     private String distinguishedName;
 
     @NotNull
-    private LocalDate validFrom;
+    private Date validFrom;
 
     @NotNull
-    private LocalDate validTo;
+    private Date validTo;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -40,10 +44,12 @@ public class CertificateAuthority {
     private CertificateType type;
 
     @ManyToOne
+    @JoinColumn(name="issuer_id")
     private CertificateAuthority issuer; // null for RootCA
 
     @NotNull
     @ManyToOne
+    @JoinColumn(name="owner_id")
     private User owner;
 
 }
