@@ -1,11 +1,11 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.model;
 
+import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import com.ftnteam11_2025.pki.pki_system.user.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -51,5 +51,10 @@ public class CertificateAuthority {
     @ManyToOne
     @JoinColumn(name="owner_id")
     private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
+
 
 }

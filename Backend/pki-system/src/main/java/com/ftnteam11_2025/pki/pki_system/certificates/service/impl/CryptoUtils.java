@@ -14,8 +14,7 @@ import java.util.Base64;
 
 public class CryptoUtils {
 
-    @Value("${security.master-key}")
-    private static String masterKey;
+
 
     private static final String AES = "AES";
     private static final String AES_GCM_NO_PADDING = "AES/GCM/NoPadding";
@@ -24,7 +23,7 @@ public class CryptoUtils {
 
 
     // encrypt plaintext with master key -> get cipher text
-    public static String encrypt(String plaintext) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    public static String encrypt(String plaintext, String masterKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         SecureRandom rng = new SecureRandom();
         byte[] iv = new byte[IV_LENGTH];
         rng.nextBytes(iv);
@@ -45,7 +44,7 @@ public class CryptoUtils {
         return Base64.getEncoder().encodeToString(out);
     }
 
-    public static String decrypt(String base64IvAndCipherText) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+    public static String decrypt(String base64IvAndCipherText, String masterKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         byte[] ivAndCipher = Base64.getDecoder().decode(base64IvAndCipherText);
         if (ivAndCipher.length < IV_LENGTH) throw new IllegalArgumentException("Invalid data");
 
