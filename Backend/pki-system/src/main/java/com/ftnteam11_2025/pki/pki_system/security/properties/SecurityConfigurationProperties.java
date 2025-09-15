@@ -17,4 +17,5 @@ import java.util.List;
 public class SecurityConfigurationProperties {
     @NotNull
     private List<EndpointConfig> publicEndpoints;
+    private String masterKey;
 }
