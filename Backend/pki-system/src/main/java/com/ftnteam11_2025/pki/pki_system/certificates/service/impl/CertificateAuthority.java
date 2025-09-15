@@ -14,7 +14,7 @@ import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrgani
 import com.ftnteam11_2025.pki.pki_system.user.model.User;
 import com.ftnteam11_2025.pki.pki_system.user.model.UserRole;
 import com.ftnteam11_2025.pki.pki_system.user.repository.UserRepository;
-import com.ftnteam11_2025.pki.pki_system.util.exception.InvalidRequestError;
+import com.ftnteam11_2025.pki.pki_system.util.exception.BadRequestError;
 import com.ftnteam11_2025.pki.pki_system.util.exception.NotFoundError;
 import lombok.AllArgsConstructor;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -56,7 +56,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     private User getValidatedUser(Long userId){
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundError("User not found"));
         if(user.getRole()!= UserRole.CA){
-            throw new InvalidRequestError("User does not have CA role");
+            throw new BadRequestError("User does not have CA role");
         }
         return user;
     }
@@ -123,9 +123,11 @@ public class CertificateAuthority implements ICertificateAuthorityService {
                 .ksFilePath(ksFilePath)
                 .build();
 
+        Organization organization = organizationService.createOrganization(organizationRequestDTO);
+
         // 4. save jks
         saveJKSFile(keyStorePassword, pk, certificate, ksFilePath, alias);
-        return organizationService.createOrganization(organizationRequestDTO);
+        return organization;
     }
 
     private void saveJKSFile(String pass, PrivateKey pk, X509Certificate certificate, String path, String alias) throws Exception {
