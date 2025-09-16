@@ -11,6 +11,10 @@ import {CertificateServiceService} from '../../service/certificate-service.servi
 import {OrganizationService} from '../../../organization/service/organization.service';
 import {OrganizationResponseDTO} from '../../../organization/model/organization-responseDTO';
 import {OrganizationListComponent} from '../../../organization/component/organization-list/organization-list.component';
+import {OrganizationHierarchy} from '../../../organization/model/organization-hierarchy';
+import {
+  OrganizationHierarchyComponent
+} from '../../../organization/component/organization-hierarchy/organization-hierarchy.component';
 
 @Component({
   selector: 'app-form-certificate',
@@ -19,7 +23,8 @@ import {OrganizationListComponent} from '../../../organization/component/organiz
     ReactiveFormsModule,
     NgForOf,
     NgIf,
-    OrganizationListComponent
+    OrganizationListComponent,
+    OrganizationHierarchyComponent
   ],
   templateUrl: './form-certificate.component.html',
   styleUrl: './form-certificate.component.css'
@@ -28,6 +33,7 @@ export class FormCertificateComponent {
   users: UserResponse[] = [];
   existingCerts:CertificateResponse[] = []
   organizations: OrganizationResponseDTO[] = [];
+  hierarchyOrgs: OrganizationHierarchy[] = [];
 
   form!: FormGroup;
   today!: string;
@@ -75,6 +81,7 @@ export class FormCertificateComponent {
     this.getAllUsers();
     this.getParentCertificates();
     this.getAllOrganizations();
+    this.getOrganizationHierarchy()
   }
 
   isInvalid(controlName: string): boolean {
@@ -115,6 +122,18 @@ export class FormCertificateComponent {
     })
   }
 
+  getOrganizationHierarchy(){
+    this.organizationService.getHierarchy().subscribe({
+      next: (res:OrganizationHierarchy[]) => {
+        this.hierarchyOrgs = res;
+        console.log(res);
+      },
+      error: (err) => {
+        this.toast.error(err.message, 'Error');
+      }
+    })
+  }
+
   get showParentDropdown() {
     const t = this.form.get('certificateType')!.value;
     return t === 'CA' || t === 'EndEntity';
@@ -135,6 +154,7 @@ export class FormCertificateComponent {
         this.form.reset();
         this.getParentCertificates();
         this.getAllOrganizations();
+        this.getOrganizationHierarchy();
       },
       error: (err) => {
         this.toast.error(err.message, 'Error');

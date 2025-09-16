@@ -4,6 +4,7 @@ import {catchError, Observable} from 'rxjs';
 import {environment} from '../../environment/environment';
 import {HttpClient} from '@angular/common/http';
 import {handleHttpError} from '../../shared/error-handle/httpHandle';
+import {OrganizationHierarchy} from '../model/organization-hierarchy';
 
 @Injectable({
   providedIn: 'root'
@@ -15,5 +16,10 @@ export class OrganizationService {
   getAllOrganizations(): Observable<OrganizationResponseDTO[]> {
     return this.http.get<OrganizationResponseDTO[]>(`${environment.apiHost}/api/organizations`)
       .pipe(catchError(handleHttpError))
+  }
+
+  getHierarchy(): Observable<OrganizationHierarchy[]> {
+    return this.http.get<OrganizationHierarchy[]>(`${environment.apiHost}/api/organizations/hierarchy`)
+    .pipe(catchError(handleHttpError))
   }
 }
