@@ -16,7 +16,8 @@ public interface ICertificateUtilsService {
                               PrivateKey pk,
                               X509Certificate certificate,
                               CertificateType type,
-                              String alias) throws Exception;
+                              String alias,
+                              String ksFilePath) throws Exception;
 
     Issuer getIssuer(CertificateAuthority certificateAuthority, String orgName) throws Exception;
 

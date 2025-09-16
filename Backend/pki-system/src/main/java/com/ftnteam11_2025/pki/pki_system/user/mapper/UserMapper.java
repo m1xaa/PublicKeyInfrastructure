@@ -15,5 +15,6 @@ public interface UserMapper {
     User toUser(RegisterRequestDTO registerRequestDTO);
 
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "organizationName", source = "organizationName")
     UserResponseDTO toResponseDTO(User user);
 }

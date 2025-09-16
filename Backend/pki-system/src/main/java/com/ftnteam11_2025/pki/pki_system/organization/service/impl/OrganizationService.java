@@ -28,17 +28,14 @@ public class OrganizationService implements IOrganizationService {
     private final CertificateAuthorityRepository certificateAuthorityRepository;
 
     @Override
-    public Organization createOrganization(OrganizationRequestDTO req) {
-        Optional<Organization> organization = organizationRepository.findByName(req.getName());
-        if(organization.isPresent()) {
-            return organization.get();
-        }
+    public Organization saveOrganization(Organization org) {
 
-        if(req.getName().length() < 2){
+
+        if(org.getName().length() < 2){
             throw new BadRequestError("Name must be at least 2 characters");
         }
 
-        return organizationRepository.save(organizationMapper.toOrganization(req));
+        return organizationRepository.save(org);
     }
 
     @Override

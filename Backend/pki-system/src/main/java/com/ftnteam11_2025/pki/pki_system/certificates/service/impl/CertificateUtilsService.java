@@ -6,6 +6,7 @@ import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateType;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.Issuer;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateUtilsService;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationRequestDTO;
+import com.ftnteam11_2025.pki.pki_system.organization.mapper.OrganizationMapper;
 import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import com.ftnteam11_2025.pki.pki_system.organization.repository.OrganizationRepository;
 import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrganizationService;
@@ -22,53 +23,64 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class CertificateUtilsService implements ICertificateUtilsService {
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
-    private final IOrganizationService organizationService;
     private final KeyStoreReader keyStoreReader;
     private final KeyStoreWriter keyStoreWriter;
+    private final OrganizationMapper organizationMapper;
 
     @Value("${security.master-key}")
     private String masterKey;
 
-    public CertificateUtilsService(UserRepository userRepository, OrganizationRepository organizationRepository, IOrganizationService organizationService, KeyStoreReader keyStoreReader, KeyStoreWriter keyStoreWriter) {
+    public CertificateUtilsService(UserRepository userRepository, OrganizationRepository organizationRepository , KeyStoreReader keyStoreReader, KeyStoreWriter keyStoreWriter, OrganizationMapper organizationMapper) {
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
-        this.organizationService = organizationService;
+        this.organizationMapper = organizationMapper;
         this.keyStoreReader = keyStoreReader;
         this.keyStoreWriter = keyStoreWriter;
     }
 
     @Transactional
     @Override
-    public Organization saveTransfer(String organizationName, PrivateKey pk, X509Certificate certificate, CertificateType type, String alias) throws Exception {
-        // 1. generate passwords
-        String keyStorePassword = PasswordUtils.generateRandomPassword(24);
-        String privateKeyPassword = PasswordUtils.generateRandomPassword(24);
-
-        // 2. encrypt passwords
-        String encryptedKeyStorePassword = CryptoUtils.encrypt(keyStorePassword, masterKey);
-        String encryptedPrivateKeyPassword = CryptoUtils.encrypt(privateKeyPassword, masterKey);
-
-        // 3. create organization
-        String ksFilePath = "src/main/resources/static/keystores/" + organizationName + "_" + System.currentTimeMillis() + ".jks";
-
+    public Organization saveTransfer(String organizationName, PrivateKey pk, X509Certificate certificate, CertificateType type, String alias, String ksFilePath) throws Exception {
+        String keyStorePassword;
+        String privateKeyPassword;
+        String encryptedKeyStorePassword;
+        String encryptedPrivateKeyPassword;
 
         Organization organization;
         if(type == CertificateType.RootCA){
-            OrganizationRequestDTO organizationRequestDTO = OrganizationRequestDTO.builder()
-                    .name(organizationName)
-                    .encryptedKeyStorePassword(encryptedKeyStorePassword)
-                    .encryptedPrivateKeyPassword(encryptedPrivateKeyPassword)
-                    .ksFilePath(ksFilePath)
-                    .build();
-            organization = organizationService.createOrganization(organizationRequestDTO);
+            Optional<Organization> organizationFound = organizationRepository.findByName(organizationName);
+            if(organizationFound.isPresent()) {
+                organization = organizationFound.get();
+                keyStorePassword = CryptoUtils.decrypt(organization.getEncryptedKeyStorePassword(), masterKey);
+                privateKeyPassword = CryptoUtils.decrypt(organization.getEncryptedPrivateKeyPassword(), masterKey);
+            }else{
+                keyStorePassword = PasswordUtils.generateRandomPassword(24);
+                privateKeyPassword = PasswordUtils.generateRandomPassword(24);
+                // 2. encrypt passwords
+                encryptedKeyStorePassword = CryptoUtils.encrypt(keyStorePassword, masterKey);
+                encryptedPrivateKeyPassword = CryptoUtils.encrypt(privateKeyPassword, masterKey);
+                OrganizationRequestDTO organizationRequestDTO = OrganizationRequestDTO.builder()
+                        .name(organizationName)
+                        .encryptedKeyStorePassword(encryptedKeyStorePassword)
+                        .encryptedPrivateKeyPassword(encryptedPrivateKeyPassword)
+                        .build();
+                if(organizationRequestDTO.getName().length() < 2){
+                    throw new BadRequestError("Organization name is too short");
+                }
+                organization = organizationRepository.save(organizationMapper.toOrganization(organizationRequestDTO));
+            }
+
         }else{
             organization = organizationRepository.findByName(organizationName).orElseThrow(() -> new NotFoundError("Organization not found"));
+            keyStorePassword = CryptoUtils.decrypt(organization.getEncryptedKeyStorePassword(), masterKey);
+            privateKeyPassword = CryptoUtils.decrypt(organization.getEncryptedPrivateKeyPassword(), masterKey);
         }
 
         // 4. save jks
@@ -82,10 +94,10 @@ public class CertificateUtilsService implements ICertificateUtilsService {
         Organization organization = certificateAuthority.getOrganization();
         String name = organization.getName();
         if(!Objects.equals(name, orgName)){
-            throw new BadRequestError("Invalid organization");
+            throw new BadRequestError("Certificate organization and provided organization name are different");
         }
         String alias = certificateAuthority.getAlias();
-        String ksFilePath = organization.getKsFilePath();
+        String ksFilePath = certificateAuthority.getKsFilePath();
         String encryptedKSPassword = organization.getEncryptedKeyStorePassword();
         String encryptedPKPassword = organization.getEncryptedPrivateKeyPassword();
         Long orgId = organization.getId();

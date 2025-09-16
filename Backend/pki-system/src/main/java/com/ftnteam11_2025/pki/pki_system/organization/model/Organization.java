@@ -25,7 +25,7 @@ public class Organization {
 
     private String encryptedKeyStorePassword;
     private String encryptedPrivateKeyPassword;
-    private String ksFilePath;
+
 
     @CreationTimestamp
     @Column(updatable = false)

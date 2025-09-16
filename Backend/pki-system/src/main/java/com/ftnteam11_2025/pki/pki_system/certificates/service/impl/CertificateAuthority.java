@@ -84,7 +84,9 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     public com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority createRootCA(CertificateRequestDTO requestDTO) throws Exception {
         // 0. validate owner, typeC
         User user = certificateUtilsService.validateUser(requestDTO.getUserId(), requestDTO.getCertificateType(), CertificateType.RootCA);
-
+        if(!Objects.equals(user.getOrganizationName(), requestDTO.getOrganization())){
+            throw new BadRequestError("User organization and provided organization do not match");
+        }
         // 1. generate key pair
         KeyPair keyPair = CertificateUtils.generateRSAKeyPair();
 
@@ -106,9 +108,10 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         // 4. generateRootCa certificate
         X509Certificate rootCaCert = certificateGenerator.generateRootCa(subject.getX500Name(), keyPair, validFrom, validTo);
         String alias = "cert_" + rootCaCert.getSerialNumber();
+        String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
 
         // 5. save to keystore
-        Organization organization = certificateUtilsService.saveTransfer(requestDTO.getOrganization(), keyPair.getPrivate(), rootCaCert, CertificateType.RootCA, alias);
+        Organization organization = certificateUtilsService.saveTransfer(requestDTO.getOrganization(), keyPair.getPrivate(), rootCaCert, CertificateType.RootCA, alias, ksFilePath);
 
         // 6. save certificate to db
         com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthority = com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority.builder()
@@ -121,6 +124,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
                 .issuer(null)
                 .owner(user)
                 .alias(alias)
+                .ksFilePath(ksFilePath)
                 .organization(organization)
                 .build();
 
@@ -158,9 +162,10 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         // 4. create certificate
         X509Certificate caCertificate = certificateGenerator.generateIntermediateCa(subject, issuer, validFrom, validTo);
         String alias = "cert_" + caCertificate.getSerialNumber();
+        String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
 
         // 5. save to key store
-        Organization organization = certificateUtilsService.saveTransfer(requestDTO.getOrganization(), keyPair.getPrivate(), caCertificate, CertificateType.CA, alias);
+        Organization organization = certificateUtilsService.saveTransfer(requestDTO.getOrganization(), keyPair.getPrivate(), caCertificate, CertificateType.CA, alias, ksFilePath);
 
         // 6. DB
         com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthoritySave = com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority.builder()
@@ -173,6 +178,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
                 .issuer(certificateAuthority)
                 .owner(user)
                 .alias(alias)
+                .ksFilePath(ksFilePath)
                 .organization(organization)
                 .build();
 
@@ -219,13 +225,15 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         // 4. certificate
         X509Certificate endEntityCer = certificateGenerator.generateEndEntity(subject, issuer, validFrom, validTo);
         String alias = "cert_" + endEntityCer.getSerialNumber();
+        String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
         // 5. organization
         Organization organization = certificateUtilsService.saveTransfer(
                 requestDTO.getOrganization(),
                 keyPair.getPrivate(),
                 endEntityCer,
                 CertificateType.EndEntity,
-                alias
+                alias,
+                ksFilePath
         );
 
         // 6. DB
@@ -239,6 +247,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
                 .issuer(iss)
                 .owner(user)
                 .alias(alias)
+                .ksFilePath(ksFilePath)
                 .organization(organization)
                 .build();
 

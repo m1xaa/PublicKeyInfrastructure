@@ -8,7 +8,7 @@ import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import java.util.List;
 
 public interface IOrganizationService {
-    public Organization createOrganization(OrganizationRequestDTO req);
+    public Organization saveOrganization(Organization req);
     public List<OrganizationResponseDTO> getAllOrganization();
     public List<OrganizationHierarchy> getOrganizationHierarchy();
 }

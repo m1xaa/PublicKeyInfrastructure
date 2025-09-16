@@ -58,5 +58,7 @@ public class CertificateAuthority {
 
     @NotNull
     private String alias;
+    @NotNull
+    private String ksFilePath;
 
 }

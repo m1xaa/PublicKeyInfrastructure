@@ -21,6 +21,7 @@ CREATE TABLE certificates
     owner_id           BIGINT       NOT NULL,
     organization_id    BIGINT       NOT NULL,
     alias              VARCHAR(255) NOT NULL,
+    ks_file_path       VARCHAR(255) NOT NULL,
     CONSTRAINT pk_certificates PRIMARY KEY (id)
 );
 
@@ -30,7 +31,6 @@ CREATE TABLE organization
     name                           VARCHAR(255)                            NOT NULL,
     encrypted_key_store_password   VARCHAR(255),
     encrypted_private_key_password VARCHAR(255),
-    ks_file_path                   VARCHAR(255),
     created_at                     TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_organization PRIMARY KEY (id)
 );

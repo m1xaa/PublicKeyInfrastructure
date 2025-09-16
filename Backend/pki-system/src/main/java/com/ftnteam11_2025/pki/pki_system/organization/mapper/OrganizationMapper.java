@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface OrganizationMapper {
 
+    @Mapping(source = "name", target = "name")
     Organization toOrganization(OrganizationRequestDTO organizationRequestDTO);
 
     @Mapping(source = "id", target = "id")

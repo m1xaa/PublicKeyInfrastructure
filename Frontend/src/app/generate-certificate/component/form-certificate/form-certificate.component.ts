@@ -133,6 +133,8 @@ export class FormCertificateComponent {
         console.log(cert);
         this.toast.success('Certificate generated successfully!', 'Success');
         this.form.reset();
+        this.getParentCertificates();
+        this.getAllOrganizations();
       },
       error: (err) => {
         this.toast.error(err.message, 'Error');

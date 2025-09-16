@@ -87,7 +87,7 @@
             <label for="userId" class="block text-sm font-medium text-text-600 mb-1">Owner</label>
             <select class="input" formControlName="userId">
               <option [ngValue]="null" disabled>Select User</option>
-              <option *ngFor="let u of users" [ngValue]="u.id">{{ u.firstName }}</option>
+              <option *ngFor="let u of users" [ngValue]="u.id">{{ u.firstName }} - {{u.organizationName}}</option>
             </select>
           </div>
 
