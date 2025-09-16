@@ -18,7 +18,7 @@ public class CertificateAuthorityController {
     private final com.ftnteam11_2025.pki.pki_system.certificates.service.impl.CertificateAuthority certificateAuthority;
 
     @PostMapping
-    public ResponseEntity<CertificateAuthority> create(@RequestBody CertificateRequestDTO req) throws Exception {
+    public ResponseEntity<CertificateResponseDTO> create(@RequestBody CertificateRequestDTO req) throws Exception {
         return ResponseEntity.ok(certificateAuthorityService.createCertificateAuthority(req));
     }
 

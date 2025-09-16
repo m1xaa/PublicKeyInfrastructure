@@ -7,3 +7,4 @@ security:
 
     - path: /api/user
     - path: /api/certificate
+    - path: /api/certificate/parent

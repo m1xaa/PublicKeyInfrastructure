@@ -112,6 +112,7 @@ export class FormCertificateComponent {
     const dto: CertificateRequestDTO = this.form.value;
     this.certService.generateCertificate(dto).subscribe({
       next: (cert: CertificateResponse) => {
+        console.log(cert);
         this.toast.success('Certificate generated successfully!', 'Success');
         this.form.reset();
       },

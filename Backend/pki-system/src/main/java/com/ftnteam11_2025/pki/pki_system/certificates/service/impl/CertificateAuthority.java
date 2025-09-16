@@ -66,15 +66,15 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     }
 
     @Transactional
-    public com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority createCertificateAuthority(CertificateRequestDTO req) throws Exception {
+    public CertificateResponseDTO createCertificateAuthority(CertificateRequestDTO req) throws Exception {
         if(req.getCertificateType() == CertificateType.RootCA){
-            return createRootCA(req);
+            return certificateMapper.toCertificateResponseDTO(createRootCA(req));
         }
         else if(req.getCertificateType() == CertificateType.CA){
-            return createCA(req);
+            return certificateMapper.toCertificateResponseDTO(createCA(req));
         }
         else{
-            return createEndEntity(req);
+            return certificateMapper.toCertificateResponseDTO(createEndEntity(req));
         }
     }
 
