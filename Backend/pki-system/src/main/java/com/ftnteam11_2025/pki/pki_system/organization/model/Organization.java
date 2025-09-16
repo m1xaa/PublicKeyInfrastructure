@@ -23,8 +23,6 @@ public class Organization {
     @Column(unique = true, nullable = false)
     private String name;
 
-    private String alias; // alias private key
-
     private String encryptedKeyStorePassword;
     private String encryptedPrivateKeyPassword;
     private String ksFilePath;

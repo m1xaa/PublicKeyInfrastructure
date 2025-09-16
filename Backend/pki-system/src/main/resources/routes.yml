@@ -8,3 +8,5 @@ security:
     - path: /api/user
     - path: /api/certificate
     - path: /api/certificate/parent
+    - path: /api/organizations
+    - path: /api/organizations/hierarchy

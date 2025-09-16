@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CertificateAuthorityController {
     private final ICertificateAuthorityService certificateAuthorityService;
-    private final com.ftnteam11_2025.pki.pki_system.certificates.service.impl.CertificateAuthority certificateAuthority;
 
     @PostMapping
     public ResponseEntity<CertificateResponseDTO> create(@RequestBody CertificateRequestDTO req) throws Exception {

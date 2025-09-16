@@ -14,6 +14,5 @@ public interface ICertificateAuthorityService {
     public CertificateAuthority createRootCA(CertificateRequestDTO requestDTO) throws Exception;
     public CertificateAuthority createCA(CertificateRequestDTO requestDTO) throws Exception;
     public CertificateResponseDTO createCertificateAuthority(CertificateRequestDTO requestDTO) throws Exception;
-    public Organization saveTransfer(String name, PrivateKey pk, X509Certificate certificate, CertificateType type) throws Exception;
     public List<CertificateResponseDTO> getParentCertificate();
 }

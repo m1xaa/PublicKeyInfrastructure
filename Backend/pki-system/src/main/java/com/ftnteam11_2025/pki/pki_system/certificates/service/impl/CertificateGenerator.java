@@ -54,7 +54,7 @@ public class CertificateGenerator implements ICertificateGenerator {
                 BigInteger.valueOf(System.currentTimeMillis()),
                 validFrom,
                 validTo,
-                subject.getX500Name(), // issuer = subject
+                subject.getX500Name(),
                 subject.getPublicKey()
         );
 
@@ -78,7 +78,7 @@ public class CertificateGenerator implements ICertificateGenerator {
                 BigInteger.valueOf(System.currentTimeMillis()),
                 validFrom,
                 validTo,
-                subject.getX500Name(), // issuer = subject
+                subject.getX500Name(),
                 subject.getPublicKey()
         );
 

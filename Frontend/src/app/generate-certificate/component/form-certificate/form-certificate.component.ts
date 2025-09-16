@@ -8,6 +8,9 @@ import {UserServiceService} from '../../../user/service/user-service.service';
 import {ToastrService} from 'ngx-toastr';
 import {CertificateResponse} from '../../model/certificate-response';
 import {CertificateServiceService} from '../../service/certificate-service.service';
+import {OrganizationService} from '../../../organization/service/organization.service';
+import {OrganizationResponseDTO} from '../../../organization/model/organization-responseDTO';
+import {OrganizationListComponent} from '../../../organization/component/organization-list/organization-list.component';
 
 @Component({
   selector: 'app-form-certificate',
@@ -15,7 +18,8 @@ import {CertificateServiceService} from '../../service/certificate-service.servi
   imports: [
     ReactiveFormsModule,
     NgForOf,
-    NgIf
+    NgIf,
+    OrganizationListComponent
   ],
   templateUrl: './form-certificate.component.html',
   styleUrl: './form-certificate.component.css'
@@ -23,12 +27,14 @@ import {CertificateServiceService} from '../../service/certificate-service.servi
 export class FormCertificateComponent {
   users: UserResponse[] = [];
   existingCerts:CertificateResponse[] = []
+  organizations: OrganizationResponseDTO[] = [];
 
   form!: FormGroup;
   today!: string;
 
   constructor(private fb: FormBuilder, private userService: UserServiceService,
-              private toast:ToastrService, private certService:CertificateServiceService) {}
+              private toast:ToastrService, private certService:CertificateServiceService,
+              private organizationService:OrganizationService) {}
 
 
 
@@ -68,6 +74,7 @@ export class FormCertificateComponent {
     });
     this.getAllUsers();
     this.getParentCertificates();
+    this.getAllOrganizations();
   }
 
   isInvalid(controlName: string): boolean {
@@ -90,6 +97,17 @@ export class FormCertificateComponent {
     this.certService.getCertificatesParent().subscribe({
       next: (certs:CertificateResponse[]) => {
         this.existingCerts = certs;
+      },
+      error: (err) => {
+        this.toast.error(err.message, 'Error');
+      }
+    })
+  }
+
+  getAllOrganizations(){
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (res:OrganizationResponseDTO[]) => {
+        this.organizations = res;
       },
       error: (err) => {
         this.toast.error(err.message, 'Error');

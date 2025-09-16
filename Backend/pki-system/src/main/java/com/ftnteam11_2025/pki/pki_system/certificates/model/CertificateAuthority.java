@@ -56,5 +56,7 @@ public class CertificateAuthority {
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
+    @NotNull
+    private String alias;
 
 }
