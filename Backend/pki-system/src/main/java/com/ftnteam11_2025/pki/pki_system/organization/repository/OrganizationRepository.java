@@ -1,5 +1,6 @@
 package com.ftnteam11_2025.pki.pki_system.organization.repository;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import org.springframework.data.jpa.repository.JpaRepository;
 

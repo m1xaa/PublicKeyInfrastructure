@@ -4,6 +4,8 @@ import { ActivateAccountComponent } from './user/activate-account/activate-accou
 import { LoginComponent } from './user/login/login.component';
 import { unauthenticatedGuard } from './infrastructure/auth/guard/unauthenticated.guard';
 import { NotFoundComponent } from './layout/not-found/not-found/not-found.component';
+import {ListCertificateComponent} from './generate-certificate/component/list-certificate/list-certificate.component';
+import {FormCertificateComponent} from './generate-certificate/component/form-certificate/form-certificate.component';
 
 export const routes: Routes = [
   {
@@ -19,6 +21,16 @@ export const routes: Routes = [
   {
     path: 'user/login',
     component: LoginComponent,
+    canActivate: [unauthenticatedGuard],
+  },
+  {
+    path: 'admin-panel',
+    component: ListCertificateComponent,
+    canActivate: [unauthenticatedGuard],
+  },
+  {
+    path: 'admin-panel/form-certificate',
+    component: FormCertificateComponent,
     canActivate: [unauthenticatedGuard],
   },
   {

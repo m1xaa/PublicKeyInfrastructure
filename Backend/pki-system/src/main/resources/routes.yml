@@ -4,4 +4,6 @@ security:
     - path: /api/user/activate
     - path: /api/user/login
     - path: /api/refresh
-    - path: /api/ca
+
+    - path: /api/user
+    - path: /api/certificate

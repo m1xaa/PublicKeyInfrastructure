@@ -1,7 +1,13 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.repository;
 
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
+import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateStatus;
+import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CertificateAuthorityRepository extends JpaRepository<CertificateAuthority, Integer> {
+import java.util.List;
+import java.util.UUID;
+
+public interface CertificateAuthorityRepository extends JpaRepository<CertificateAuthority, UUID> {
+    List<CertificateAuthority> findAllByStatusAndTypeNot(CertificateStatus status, CertificateType type);
 }

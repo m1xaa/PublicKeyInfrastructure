@@ -1,6 +1,7 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.service.impl;
 
 import com.ftnteam11_2025.pki.pki_system.certificates.model.Issuer;
+import com.ftnteam11_2025.pki.pki_system.util.exception.BadRequestError;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,9 @@ public class KeyStoreReader {
         try {
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile));
             keyStore.load(in, password);
-
+            if (!keyStore.containsAlias(alias)) {
+                throw new BadRequestError("Alias not found in keystore: " + alias);
+            }
             Certificate cert = keyStore.getCertificate(alias);
 
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, keyPass);

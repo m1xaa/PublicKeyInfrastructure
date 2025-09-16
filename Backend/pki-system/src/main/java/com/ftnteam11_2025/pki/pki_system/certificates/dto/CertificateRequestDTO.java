@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,6 +23,8 @@ public class CertificateRequestDTO {
 
     private LocalDate validFrom;
     private LocalDate validTo;
+
+    private UUID certificateId;
 
     private CertificateType certificateType;
     private List<ExtensionDTO> extensions;

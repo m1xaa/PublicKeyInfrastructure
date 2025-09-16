@@ -1,6 +1,7 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.controller;
 
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateRequestDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateAuthorityService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/ca")
+@RequestMapping("api/certificate")
 @RequiredArgsConstructor
 public class CertificateAuthorityController {
     private final ICertificateAuthorityService certificateAuthorityService;
@@ -18,12 +19,11 @@ public class CertificateAuthorityController {
 
     @PostMapping
     public ResponseEntity<CertificateAuthority> create(@RequestBody CertificateRequestDTO req) throws Exception {
-        return ResponseEntity.ok(certificateAuthorityService.createCA(req));
+        return ResponseEntity.ok(certificateAuthorityService.createCertificateAuthority(req));
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAll() {
-        certificateAuthority.readJKSFIle();
-        return null;
+    @GetMapping("/parent")
+    public ResponseEntity<List<CertificateResponseDTO>> getAllParent() {
+        return ResponseEntity.ok(certificateAuthorityService.getParentCertificate());
     }
 }
