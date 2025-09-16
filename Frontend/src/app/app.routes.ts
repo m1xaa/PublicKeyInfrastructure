@@ -6,6 +6,7 @@ import { unauthenticatedGuard } from './infrastructure/auth/guard/unauthenticate
 import { NotFoundComponent } from './layout/not-found/not-found/not-found.component';
 import {ListCertificateComponent} from './generate-certificate/component/list-certificate/list-certificate.component';
 import {FormCertificateComponent} from './generate-certificate/component/form-certificate/form-certificate.component';
+import {authGuard} from './infrastructure/auth/guard/auth.guard';
 
 export const routes: Routes = [
   {
@@ -29,9 +30,9 @@ export const routes: Routes = [
     canActivate: [unauthenticatedGuard],
   },
   {
-    path: 'admin-panel/form-certificate',
+    path: 'certificates',
     component: FormCertificateComponent,
-    canActivate: [unauthenticatedGuard],
+    canActivate: [authGuard],
   },
   {
     path: '**',
