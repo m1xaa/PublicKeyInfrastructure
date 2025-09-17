@@ -1,0 +1,38 @@
+<div class="w-full max-w-md mx-auto rounded-2xl shadow-md bg-primary-100">
+  <!-- Header -->
+  <button
+    (click)="toggle()"
+    class="w-full flex justify-between items-center px-4 py-3 text-left
+           text-text-700 font-semibold text-lg
+           bg-primary-200 hover:bg-primary-300 rounded-t-2xl transition-colors"
+  >
+    <span>Organizations</span>
+    <svg
+      class="h-5 w-5 transform transition-transform duration-300"
+      [class.rotate-180]="isOpen"
+      fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  <!-- Body -->
+  <div
+    *ngIf="isOpen"
+    class="px-4 py-2 space-y-2 bg-primary-100 rounded-b-2xl text-text-600"
+  >
+    <ng-container *ngIf="organizations.length; else empty">
+      <div
+        *ngFor="let org of organizations"
+        class="p-2 border-b border-primary-300 last:border-b-0"
+      >
+        {{ org.name }}
+      </div>
+    </ng-container>
+
+    <ng-template #empty>
+      <p class="text-text-400 text-sm italic">No organizations available.</p>
+    </ng-template>
+  </div>
+</div>

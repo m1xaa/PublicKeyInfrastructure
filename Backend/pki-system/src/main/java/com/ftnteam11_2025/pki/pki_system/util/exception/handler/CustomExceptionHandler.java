@@ -1,10 +1,7 @@
 package com.ftnteam11_2025.pki.pki_system.util.exception.handler;
 
 import com.ftnteam11_2025.pki.pki_system.util.dto.ErrorResponseDTO;
-import com.ftnteam11_2025.pki.pki_system.util.exception.InvalidRequestError;
-import com.ftnteam11_2025.pki.pki_system.util.exception.NotFoundError;
-import com.ftnteam11_2025.pki.pki_system.util.exception.ServerError;
-import com.ftnteam11_2025.pki.pki_system.util.exception.UnauthorizedError;
+import com.ftnteam11_2025.pki.pki_system.util.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,6 +20,14 @@ public class CustomExceptionHandler {
         logger.warn("NotFoundError: {}", error.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), error.getMessage())
+        );
+    }
+
+    @ExceptionHandler(BadRequestError.class)
+    public ResponseEntity<ErrorResponseDTO> handleBadRequestError(BadRequestError error) {
+        logger.warn("BadRequestError: {}", error.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(), error.getMessage())
         );
     }
 
