@@ -112,6 +112,29 @@
           >
         </li>
       </ul>
+      }@else if ((isCA$|async)) {
+      <ul
+        class="flex flex-col font-medium p-2 md:p-0 mt- rounded-lg bg-primary-700 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:bg-primary-700"
+      >
+        <li>
+          <a
+            routerLink="/user/approve"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Applications</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/certificates"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Certificates</a
+          >
+        </li>
+      </ul>
       }
     </div>
   </div>

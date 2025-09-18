@@ -10,6 +10,7 @@ import { authGuard } from './infrastructure/auth/guard/auth.guard';
 import { HomePageComponent } from './home-page/home-page.component';
 import { RegisterCaComponent } from './user/register-ca/register-ca.component';
 import { ActivateAccountCaComponent } from './user/activate-account-ca/activate-account-ca.component';
+import { ApproveUsersComponent } from './user/ca/approve-users/approve-users.component';
 
 export const routes: Routes = [
   {
@@ -42,6 +43,12 @@ export const routes: Routes = [
     path: 'user/login',
     component: LoginComponent,
     canActivate: [unauthenticatedGuard],
+  },
+  {
+    path: 'user/approve',
+    component: ApproveUsersComponent,
+    canActivate: [authGuard],
+    data: { roles: ['CA'] },
   },
   {
     path: 'admin-panel',

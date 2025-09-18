@@ -24,7 +24,7 @@
 }
 
 .datepicker-cell:hover {
-  background-color: var(--color-secondary-500) !important;
+  background-color: var(--color-primary-600) !important;
   color: white !important;
 }
 
