@@ -31,6 +31,10 @@ export class NavbarComponent {
     );
   }
 
+  get isCA$(): Observable<boolean> {
+    return this.authService.userRole$.pipe(map((role) => role === UserRole.Ca));
+  }
+
   public logOut() {
     this.authService.logOut();
     this.router.navigate(['/']).then(() => {

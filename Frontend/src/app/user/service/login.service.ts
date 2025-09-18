@@ -16,12 +16,6 @@ export class LoginService {
     private httpClient: HttpClient
   ) {}
 
-  testLogin(): Observable<LoginResponse> {
-    return this.httpClient.get<LoginResponse>(
-      environment.apiHost + '/api/user/test'
-    );
-  }
-
   login(email: string, password: string): Observable<void> {
     return this.httpClient
       .post<LoginResponse>(environment.apiHost + '/api/user/login', {

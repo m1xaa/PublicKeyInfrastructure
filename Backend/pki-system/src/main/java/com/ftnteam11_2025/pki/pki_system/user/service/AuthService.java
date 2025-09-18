@@ -1,6 +1,8 @@
 package com.ftnteam11_2025.pki.pki_system.user.service;
 
 import com.ftnteam11_2025.pki.pki_system.email.service.EmailService;
+import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
+import com.ftnteam11_2025.pki.pki_system.organization.repository.OrganizationRepository;
 import com.ftnteam11_2025.pki.pki_system.security.jwt.JwtService;
 import com.ftnteam11_2025.pki.pki_system.security.refresh.model.RefreshToken;
 import com.ftnteam11_2025.pki.pki_system.security.refresh.service.RefreshTokenService;
@@ -43,6 +45,7 @@ public class AuthService {
     private final AccountRepository  accountRepository;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final OrganizationRepository organizationRepository;
     @Value("${activation.time.limit}")
     private Duration activationTimeLimit;
     private final RegistrationRequestRepository registrationRequestRepository;
@@ -56,7 +59,6 @@ public class AuthService {
         if(accountRepository.existsByEmail(registerRequestDTO.getEmail())) {
             throw new InvalidRequestError("Email address is already taken");
         }
-
         User user = userService.createUser(registerRequestDTO);
 
         RegistrationRequest registrationRequest =RegistrationRequest.builder()
@@ -80,6 +82,27 @@ public class AuthService {
         );
     }
 
+    public boolean registerCA(@Valid CARegisterRequestDTO registerRequestDTO) {
+        if(accountRepository.existsByEmail(registerRequestDTO.getEmail())) {
+            throw new InvalidRequestError("Email address is already taken");
+        }
+        User user = userService.createUser(registerRequestDTO);
+
+        RegistrationRequest registrationRequest =RegistrationRequest.builder()
+                .email(registerRequestDTO.getEmail())
+                .password(passwordEncoder.encode(""))
+                .user(user)
+                .expirationTime(Instant.now().plus(activationTimeLimit))
+                .verificationCode(VerificationCodeGenerator.generateVerificationCode(VERIFICATION_CODE_LENGTH))
+                .build();
+
+
+        emailService.sendAccountActivationEmailCA(registrationRequest);
+        registrationRequestRepository.save(registrationRequest);
+
+        return true;
+    }
+
     @Transactional
     public void activateAccount(@Valid VerificationCodeDTO dto) {
         RegistrationRequest registrationRequest
@@ -94,6 +117,36 @@ public class AuthService {
             registrationRequestRepository.delete(registrationRequest);
             throw new NotFoundError("Activation code invalid or expired");
         }
+
+        Account account = Account.builder()
+                .email(registrationRequest.getEmail())
+                .password(registrationRequest.getPassword())
+                .user(registrationRequest.getUser())
+                .status(AccountStatus.PENDING)
+                .build();
+
+        registrationRequest.getUser().setAccount(account);
+
+        accountRepository.save(account);
+        registrationRequestRepository.delete(registrationRequest);
+    }
+
+    @Transactional
+    public void activateAccountCA(@Valid CASetPasswordRequest dto) {
+        RegistrationRequest registrationRequest
+                = registrationRequestRepository.findByVerificationCode(dto.getVerificationCode())
+                .orElseThrow(() -> new NotFoundError("Activation code invalid or expired"));
+
+        if (accountRepository.existsByEmail(registrationRequest.getEmail())) {
+            throw new InvalidRequestError("Email address is already taken");
+        }
+
+        if (registrationRequest.getExpirationTime().isBefore(Instant.now())) {
+            registrationRequestRepository.delete(registrationRequest);
+            throw new NotFoundError("Activation code invalid or expired");
+        }
+
+        registrationRequest.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         Account account = Account.builder()
                 .email(registrationRequest.getEmail())
@@ -118,18 +171,22 @@ public class AuthService {
 
             UserDetailsImpl  userDetails = (UserDetailsImpl) authentication.getPrincipal();
             User user = userRepository.findById(userDetails.getUserId()).orElseThrow(()-> new UnauthenticatedError("Invalid credentials"));
+            if(user.getAccount().getStatus().equals(AccountStatus.ACTIVE)) {
+                String jwt = jwtService.generateToken(userDetails);
+                RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+                return new LoginResponseDTO(
+                        userDetails.getUserId(),
+                        userDetails.getUsername(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        userDetails.getUserRole(),
+                        jwt,
+                        refreshToken.getToken()
+                );
+            }else{
+                throw new UnauthenticatedError("Invalid credentials");
+            }
 
-            String jwt = jwtService.generateToken(userDetails);
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-            return new LoginResponseDTO(
-                    userDetails.getUserId(),
-                    userDetails.getUsername(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    userDetails.getUserRole(),
-                    jwt,
-                    refreshToken.getToken()
-            );
         }catch (DisabledException e) {
             throw new UnauthenticatedError("Account has been deactivated");
         } catch (BadCredentialsException e) {

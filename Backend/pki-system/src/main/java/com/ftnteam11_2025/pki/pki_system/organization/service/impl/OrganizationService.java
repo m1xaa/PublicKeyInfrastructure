@@ -2,10 +2,9 @@ package com.ftnteam11_2025.pki.pki_system.organization.service.impl;
 
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.repository.CertificateAuthorityRepository;
-import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationHierarchy;
-import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationNode;
-import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationRequestDTO;
-import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationResponseDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.impl.CryptoUtils;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.impl.PasswordUtils;
+import com.ftnteam11_2025.pki.pki_system.organization.dto.*;
 import com.ftnteam11_2025.pki.pki_system.organization.mapper.HierarchyMapper;
 import com.ftnteam11_2025.pki.pki_system.organization.mapper.OrganizationMapper;
 import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
@@ -14,18 +13,23 @@ import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrgani
 import com.ftnteam11_2025.pki.pki_system.util.exception.BadRequestError;
 import com.ftnteam11_2025.pki.pki_system.util.exception.InvalidRequestError;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrganizationService implements IOrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final OrganizationMapper organizationMapper;
     private final CertificateAuthorityRepository certificateAuthorityRepository;
+
+    @Value("${security.master-key}")
+    private String masterKey;
 
     @Override
     public Organization saveOrganization(Organization org) {
@@ -80,6 +84,27 @@ public class OrganizationService implements IOrganizationService {
         }
 
         return result;
+    }
+
+    @Override
+    public OrganizationResponseDTO create(CreateOrganizationRequestDTO dto) {
+        try {
+            String keyStorePassword = PasswordUtils.generateRandomPassword(24);
+            String privateKeyPassword = PasswordUtils.generateRandomPassword(24);
+            String encryptedKeyStorePassword = CryptoUtils.encrypt(keyStorePassword, masterKey);
+            String encryptedPrivateKeyPassword = CryptoUtils.encrypt(privateKeyPassword, masterKey);
+
+            Organization organization = new Organization();
+            organization.setName(dto.getName());
+            organization.setEncryptedKeyStorePassword(encryptedKeyStorePassword);
+            organization.setEncryptedPrivateKeyPassword(encryptedPrivateKeyPassword);
+            this.saveOrganization(organization);
+            return organizationMapper.toOrganizationResponseDTO(organization);
+        }
+        catch (Exception e) {
+            return new OrganizationResponseDTO();
+        }
+
     }
 
 }

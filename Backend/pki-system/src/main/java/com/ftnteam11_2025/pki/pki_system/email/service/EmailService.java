@@ -26,4 +26,14 @@ public class EmailService {
             logger.warn("Failed to send account activation email for request: {}", registrationRequest.getId());
         }
     }
+
+    @Async
+    public void sendAccountActivationEmailCA(RegistrationRequest registrationRequest) {
+        EmailDTO email = emailGeneratorService.getAccountActivationEmailCA(registrationRequest);
+        try {
+            emailSenderService.sendEmail(email);
+        } catch (EmailSendFailedException e) {
+            logger.warn("Failed to send account activation email for request: {}", registrationRequest.getId());
+        }
+    }
 }

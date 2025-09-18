@@ -84,7 +84,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     public com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority createRootCA(CertificateRequestDTO requestDTO) throws Exception {
         // 0. validate owner, typeC
         User user = certificateUtilsService.validateUser(requestDTO.getUserId(), requestDTO.getCertificateType(), CertificateType.RootCA);
-        if(!Objects.equals(user.getOrganizationName(), requestDTO.getOrganization())){
+        if(!Objects.equals(user.getOrganization().getName(), requestDTO.getOrganization())){
             throw new BadRequestError("User organization and provided organization do not match");
         }
         // 1. generate key pair

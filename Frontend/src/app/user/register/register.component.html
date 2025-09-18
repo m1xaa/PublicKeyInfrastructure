@@ -1,16 +1,11 @@
-<section class="bg-secondary-800">
+<section class="bg-white mb-11">
   <div
-    class="flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-screen lg:py-0 overflow-y-auto"
+    class="mb-10 flex flex-col items-center justify-center px-6 py-8 lg:py-0"
   >
-    <a
-      routerLink="/"
-      class="flex items-center mb-6 text-2xl font-semibold text-white"
-    >
-    </a>
-    <div class="w-full rounded-lg shadow border sm:max-w-md xl:p-0 bg-primary">
-      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+    <div class="w-full rounded-lg shadow border sm:max-w-md xl:p-0">
+      <div class="p-6 space-y-4 md:space-y-6 sm:p-8 bg-primary-100">
         <h1
-          class="text-xl font-bold leading-tight tracking-tight md:text-2xl text-white text-center"
+          class="text-xl font-bold leading-tight tracking-tight md:text-2xl text-primary-500 text-center"
         >
           Create an account
         </h1>
@@ -24,7 +19,7 @@
           <div class="mb-1">
             <label
               for="firstName"
-              class="block mb-2 text-sm font-medium text-white"
+              class="block mb-2 text-sm font-medium text-primary-400"
             >
               First name
             </label>
@@ -35,14 +30,9 @@
                 name="firstName"
                 formControlName="firstName"
                 required
-                class="peer block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent focus:placeholder-white"
+                class="input w-full border p-2"
+                placeholder="First name"
               />
-              <label
-                for="firstName"
-                class="absolute text-sm text-white duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-white peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-white"
-              >
-                First name
-              </label>
             </div>
             <p
               *ngIf="
@@ -60,7 +50,7 @@
           <div class="mb-1">
             <label
               for="lastName"
-              class="block mb-2 text-sm font-medium text-white"
+              class="block mb-2 text-sm font-medium text-primary-400"
             >
               Last name
             </label>
@@ -71,14 +61,9 @@
                 name="lastName"
                 formControlName="lastName"
                 required
-                class="peer block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent focus:placeholder-white"
+                class="input w-full border p-2"
+                placeholder="Last name"
               />
-              <label
-                for="lastName"
-                class="absolute text-sm text-white duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-white peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-white"
-              >
-                Last name
-              </label>
             </div>
             <p
               *ngIf="
@@ -95,36 +80,34 @@
           <!-- ORGANIZATION NAME -->
           <div class="mb-1">
             <label
-              for="organizationName"
-              class="block mb-2 text-sm font-medium text-white"
+              for="organizationId"
+              class="block mb-2 text-sm font-medium text-primary-400"
             >
-              Organization name
+              Organization
             </label>
             <div class="relative">
-              <input
-                type="text"
-                id="organizationName"
-                name="organizationName"
-                formControlName="organizationName"
+              <select
+                id="organizationId"
+                name="organizationId"
+                formControlName="organizationId"
                 required
-                class="peer block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent focus:placeholder-white"
-              />
-              <label
-                for="organizationName"
-                class="absolute text-sm text-white duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-white peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-white"
+                class="input w-full border p-2"
               >
-                Organization name
-              </label>
+                <option value="" disabled selected>Select organization</option>
+                <option *ngFor="let org of organizations" [value]="org.id">
+                  {{ org.name }}
+                </option>
+              </select>
             </div>
             <p
               *ngIf="
-                organizationName?.invalid &&
-                (organizationName?.dirty || organizationName?.touched)
+                organizationId?.invalid &&
+                (organizationId?.dirty || organizationId?.touched)
               "
               class="mt-1 text-xs text-red-500"
             >
-              <span *ngIf="organizationName?.errors?.['required']">
-                Organization name is required.
+              <span *ngIf="organizationId?.errors?.['required']">
+                Organization is required.
               </span>
             </p>
           </div>
@@ -133,7 +116,7 @@
           <div class="mb-1">
             <label
               for="email"
-              class="block mb-1 text-sm font-medium text-white"
+              class="block mb-1 text-sm font-medium text-primary-400"
             >
               Your email
             </label>
@@ -144,15 +127,9 @@
                 name="email"
                 formControlName="email"
                 required
-                class="peer block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-white"
+                class="input w-full border p-2"
                 placeholder="example@company.com"
               />
-              <label
-                for="email"
-                class="absolute text-sm text-white duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-placeholder-shown:scale-75 peer-placeholder-shown:-translate-y-4 peer-placeholder-shown:text-white peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-white"
-              >
-                Email address
-              </label>
             </div>
             <p
               *ngIf="email?.invalid && (email?.dirty || email?.touched)"
@@ -171,7 +148,7 @@
           <div class="mb-1">
             <label
               for="password"
-              class="block mb-1 text-sm font-medium text-white"
+              class="block mb-1 text-sm font-medium text-primary-400"
             >
               Your password
             </label>
@@ -184,19 +161,14 @@
                 minlength="8"
                 required
                 autocomplete="new-password"
-                class="peer block w-full rounded-t-lg px-2.5 pb-2.5 pt-5 text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent"
+                class="input w-full border p-2"
+                (input)="evaluatePasswordStrength(password?.value)"
+                placeholder="Your password"
               />
-              <label
-                for="password"
-                class="absolute text-sm text-white duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-white peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-white"
-              >
-                Enter password
-              </label>
-
               <button
                 type="button"
                 (click)="togglePasswordVisibility('password')"
-                class="absolute right-2 inset-y-0 flex items-center text-secondary-100 hover:text-white transition-colors duration-200 cursor-pointer"
+                class="absolute right-2 inset-y-0 flex items-center text-primary-400 hover:text-primary-600 transition-colors duration-200 cursor-pointer"
               >
                 <svg
                   *ngIf="!showPassword"
@@ -250,13 +222,31 @@
                 one letter and one number.
               </span>
             </p>
+
+            <div *ngIf="!password?.invalid">
+              <div
+                style="
+                  width: 100%;
+                  height: 8px;
+                  background: #eee;
+                  border-radius: 4px;
+                  overflow: hidden;
+                "
+              >
+                <div
+                  [style.width.%]="(passwordStrengthScore / 4) * 100"
+                  [style.background]="getStrengthColor(passwordStrengthScore)"
+                  style="height: 100%; transition: width 0.3s"
+                ></div>
+              </div>
+            </div>
           </div>
 
           <!-- CONFIRM PASSWORD -->
           <div class="mb-1">
             <label
               for="confirmPassword"
-              class="block mb-1 text-sm font-medium text-white"
+              class="block mb-1 text-sm font-medium text-primary-400"
             >
               Confirm password
             </label>
@@ -269,19 +259,14 @@
                 minlength="8"
                 required
                 autocomplete="new-password"
-                class="peer block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent"
+                class="input w-full border p-2"
+                placeholder="Confirm password"
               />
-              <label
-                for="confirmPassword"
-                class="absolute text-sm text-white duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-white peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-white"
-              >
-                Confirm password
-              </label>
 
               <button
                 type="button"
                 (click)="togglePasswordVisibility('confirmPassword')"
-                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-secondary-100 hover:text-white transition-colors duration-200 cursor-pointer"
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-primary-400 hover:text-primary-600 transition-colors duration-200 cursor-pointer"
               >
                 <svg
                   *ngIf="!showConfirmPassword"
@@ -344,11 +329,11 @@
           >
             Create an account
           </button>
-          <p class="text-sm font-light text-white">
+          <p class="text-sm font-light text-primary-600">
             Already have an account?
             <a
               routerLink="/user/login"
-              class="font-medium text-secondary-400 hover:underline"
+              class="font-medium text-primary-500 hover:underline"
               >Login here</a
             >
           </p>

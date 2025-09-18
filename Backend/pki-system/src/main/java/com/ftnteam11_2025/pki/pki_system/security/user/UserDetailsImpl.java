@@ -54,6 +54,8 @@ public class UserDetailsImpl implements UserDetails {
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         if (Objects.requireNonNull(userRole) == UserRole.ADMINISTRATOR) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else if (Objects.requireNonNull(userRole) == UserRole.CA) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_CA"));
         }
         return authorities;
     }

@@ -54,13 +54,11 @@
 </head>
 <body>
 <div class="email-container">
-    <img th:src="|${resourceUrl}logo.png|" alt="Event Planner Logo" class="logo"/>
-
     <h1>Activate Your Account</h1>
 
-    <p>Hi <span th:text="${name}">User</span>,</p>
+    <p>Hi <span th:text="${name}"></span>,</p>
 
-    <p>Welcome to Event Planner! To complete your registration and activate your account, please click the button
+    <p>Welcome to PKI system! To complete your registration and activate your account, please click the button
         below:</p>
 
     <a th:href="${activationUrl}" class="activation-button">Activate Account</a>
@@ -69,11 +67,11 @@
 
     <p th:text="${activationUrl}">Activation URL</p>
 
-    <p>This link will expire in 24 hours. If you didn't create an account with Event Planner, please ignore this
+    <p>This link will expire in 24 hours. If you didn't create an account with PKI system, please ignore this
         email.</p>
 
     <footer class="footer">
-        <p>© <span th:text="${currentYear}">2024</span> Event Planner. All rights reserved.</p>
+        <p>© <span th:text="${currentYear}">2024</span> PKI system. All rights reserved.</p>
     </footer>
 </div>
 </body>

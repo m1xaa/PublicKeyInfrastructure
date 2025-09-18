@@ -39,6 +39,15 @@ public class ThymeleafTemplateProcessorService  implements TemplateProcessorServ
         return templateEngine.process("activate", context);
     }
 
+    @Override
+    public String getAccountActivationEmailCABody(ActivationEmailBodyDTO dto) {
+        Context context = getEmailTemplateContext();
+        context.setVariable("name", dto.getFirstName() + " " + dto.getLastName());
+        context.setVariable("activationUrl", dto.getActivationUrl());
+
+        return templateEngine.process("activate", context);
+    }
+
 
 }
 
