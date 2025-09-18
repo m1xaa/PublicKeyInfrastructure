@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping("/activate/ca")
-    public ResponseEntity<Void> activateAccount(@Valid @RequestBody CASetPasswordRequest dto) {
+    public ResponseEntity<Void> activateCaAccount(@Valid @RequestBody CASetPasswordRequest dto) {
         authService.activateAccountCA(dto);
         return ResponseEntity.noContent().build();
     }

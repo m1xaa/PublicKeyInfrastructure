@@ -33,6 +33,8 @@ public class UserService {
     @Transactional
     public User createUser(@Valid RegisterRequestDTO registerRequestDTO) {
         User user = userMapper.toUser(registerRequestDTO);
+        Optional<Organization> organization  = organizationRepository.findById(registerRequestDTO.getOrganizationId());
+        user.setOrganization(organization.get());
         userRepository.save(user);
         return user;
     }

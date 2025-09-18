@@ -1,6 +1,8 @@
 package com.ftnteam11_2025.pki.pki_system.user.service;
 
 import com.ftnteam11_2025.pki.pki_system.email.service.EmailService;
+import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
+import com.ftnteam11_2025.pki.pki_system.organization.repository.OrganizationRepository;
 import com.ftnteam11_2025.pki.pki_system.security.jwt.JwtService;
 import com.ftnteam11_2025.pki.pki_system.security.refresh.model.RefreshToken;
 import com.ftnteam11_2025.pki.pki_system.security.refresh.service.RefreshTokenService;
@@ -43,6 +45,7 @@ public class AuthService {
     private final AccountRepository  accountRepository;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final OrganizationRepository organizationRepository;
     @Value("${activation.time.limit}")
     private Duration activationTimeLimit;
     private final RegistrationRequestRepository registrationRequestRepository;
@@ -56,7 +59,6 @@ public class AuthService {
         if(accountRepository.existsByEmail(registerRequestDTO.getEmail())) {
             throw new InvalidRequestError("Email address is already taken");
         }
-
         User user = userService.createUser(registerRequestDTO);
 
         RegistrationRequest registrationRequest =RegistrationRequest.builder()
@@ -120,7 +122,7 @@ public class AuthService {
                 .email(registrationRequest.getEmail())
                 .password(registrationRequest.getPassword())
                 .user(registrationRequest.getUser())
-                .status(AccountStatus.ACTIVE)
+                .status(AccountStatus.PENDING)
                 .build();
 
         registrationRequest.getUser().setAccount(account);
@@ -160,7 +162,6 @@ public class AuthService {
     }
 
     public LoginResponseDTO login(@Valid LoginRequestDTO loginRequestDTO) {
-        String password = passwordEncoder.encode(loginRequestDTO.getPassword());
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
 
@@ -170,18 +171,22 @@ public class AuthService {
 
             UserDetailsImpl  userDetails = (UserDetailsImpl) authentication.getPrincipal();
             User user = userRepository.findById(userDetails.getUserId()).orElseThrow(()-> new UnauthenticatedError("Invalid credentials"));
+            if(user.getAccount().getStatus().equals(AccountStatus.ACTIVE)) {
+                String jwt = jwtService.generateToken(userDetails);
+                RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+                return new LoginResponseDTO(
+                        userDetails.getUserId(),
+                        userDetails.getUsername(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        userDetails.getUserRole(),
+                        jwt,
+                        refreshToken.getToken()
+                );
+            }else{
+                throw new UnauthenticatedError("Invalid credentials");
+            }
 
-            String jwt = jwtService.generateToken(userDetails);
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-            return new LoginResponseDTO(
-                    userDetails.getUserId(),
-                    userDetails.getUsername(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    userDetails.getUserRole(),
-                    jwt,
-                    refreshToken.getToken()
-            );
         }catch (DisabledException e) {
             throw new UnauthenticatedError("Account has been deactivated");
         } catch (BadCredentialsException e) {
