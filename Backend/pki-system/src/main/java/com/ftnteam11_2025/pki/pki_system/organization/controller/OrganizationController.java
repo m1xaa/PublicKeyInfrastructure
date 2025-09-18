@@ -1,5 +1,6 @@
 package com.ftnteam11_2025.pki.pki_system.organization.controller;
 
+import com.ftnteam11_2025.pki.pki_system.organization.dto.CreateOrganizationRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationHierarchy;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationResponseDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrganizationService;
@@ -8,9 +9,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +30,11 @@ public class OrganizationController {
     @GetMapping("/hierarchy")
     public ResponseEntity<List<OrganizationHierarchy>> getOrganizationHierarchy(){
         return ResponseEntity.ok(organizationService.getOrganizationHierarchy());
+    }
+
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/add")
+    public ResponseEntity<OrganizationResponseDTO> createOrganization(@ModelAttribute CreateOrganizationRequestDTO dto){
+        return ResponseEntity.ok(organizationService.create(dto));
     }
 }
