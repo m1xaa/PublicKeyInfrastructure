@@ -1,10 +1,9 @@
 import { UserRole } from '../../infrastructure/auth/model/user-role.model';
 
-export interface RegisterRequest {
+export interface RegisterCARequest {
   firstName: string;
   lastName: string;
-  organizationId: number;
+  organizationId: string;
   email: string;
-  password: string;
   userRole: UserRole;
 }

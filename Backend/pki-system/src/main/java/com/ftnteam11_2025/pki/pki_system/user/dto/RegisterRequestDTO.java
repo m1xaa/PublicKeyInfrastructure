@@ -1,5 +1,6 @@
 package com.ftnteam11_2025.pki.pki_system.user.dto;
 
+import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import com.ftnteam11_2025.pki.pki_system.user.model.UserRole;
 import com.ftnteam11_2025.pki.pki_system.user.validation.AllowedRoles;
 import com.ftnteam11_2025.pki.pki_system.util.ValidationPatterns;
@@ -20,9 +21,8 @@ public class RegisterRequestDTO {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    @NotNull(message = "Organization name is required")
-    @Column(nullable = false)
-    private String organizationName;
+    @NotNull(message = "organizationId is required")
+    private long organizationId;
 
     @NotNull(message = "User role is required")
     private UserRole userRole;
@@ -43,7 +43,7 @@ public class RegisterRequestDTO {
 
     @AllowedRoles(
             value = {UserRole.REGULAR},
-            message = "Only REGULAR role are allowed"
+            message = "Only REGULAR role is allowed"
     )
     public UserRole getUserRole() {
         return this.userRole;

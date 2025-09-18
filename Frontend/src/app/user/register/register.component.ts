@@ -8,6 +8,10 @@ import { UserRole } from '../../infrastructure/auth/model/user-role.model';
 import { RegisterResponse } from '../model/register.response.model';
 import { ErrorResponse } from '../../shared/model/error.response.model';
 import { ToastrService } from 'ngx-toastr';
+import { OrganizationResponseDTO } from '../../organization/model/organization-responseDTO';
+import { OrganizationService } from '../../organization/service/organization.service';
+import zxcvbn from 'zxcvbn';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -20,16 +24,20 @@ export class RegisterComponent implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
   waitingResponse = false;
+  organizations: OrganizationResponseDTO[] = [];
 
   showDialog: boolean = false;
   dialogData: {
     registerResponse: RegisterResponse;
   } | null = null;
 
+  passwordStrengthScore: number = 0;
+
   constructor(
     private fb: FormBuilder,
     private registerService: RegisterService,
-    private toastService: ToastrService
+    private toastService: ToastrService,
+    private organizationService: OrganizationService
   ) {}
 
   ngOnInit(): void {
@@ -37,13 +45,19 @@ export class RegisterComponent implements OnInit {
       {
         firstName: ['', Validators.required],
         lastName: ['', Validators.required],
-        organizationName: ['', Validators.required],
+        organizationId: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, passwordValidator()]],
         confirmPassword: ['', Validators.required],
       },
       { validators: matchPasswordsValidator('password', 'confirmPassword') }
     );
+
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (response: OrganizationResponseDTO[]) => {
+        this.organizations = response;
+      },
+    });
   }
 
   get firstName() {
@@ -54,8 +68,8 @@ export class RegisterComponent implements OnInit {
     return this.form.get('lastName');
   }
 
-  get organizationName() {
-    return this.form.get('organizationName');
+  get organizationId() {
+    return this.form.get('organizationId');
   }
   get email() {
     return this.form.get('email');
@@ -89,32 +103,50 @@ export class RegisterComponent implements OnInit {
       const registerRequest: RegisterRequest = {
         firstName: formValues.firstName,
         lastName: formValues.lastName,
-        organizationName: formValues.organizationName,
+        organizationId: formValues.organizationId,
         email: formValues.email,
         password: formValues.password,
         userRole: UserRole.Regular,
       };
-      this.registerService.register(registerRequest).subscribe({
-        next: (response: RegisterResponse) => {
-          this.waitingResponse = false;
-          this.form.reset();
-          this.openRegisterDialog(response);
-        },
-        error: (error: ErrorResponse) => {
-          console.log(error);
-          this.waitingResponse = false;
-          this.toastService.error(error.message, 'Failed to register');
+      console.log(registerRequest);
+      this.registerService
+        .register(registerRequest)
+        .pipe(finalize(() => (this.waitingResponse = false)))
+        .subscribe({
+          next: (response: RegisterResponse) => {
+            this.form.reset();
+            this.openRegisterDialog(response);
+          },
+          error: (error: ErrorResponse) => {
+            this.toastService.error(error.message, 'Failed to register');
+          },
+        });
+    }
+  }
 
-          if (error.errors) {
-            Object.keys(error.errors).forEach((fieldName) => {
-              const control = this.form.get(fieldName);
-              if (control) {
-                control.setErrors({ serverError: error.errors[fieldName] });
-              }
-            });
-          }
-        },
-      });
+  evaluatePasswordStrength(password: string) {
+    if (!this.password?.valid) {
+      this.passwordStrengthScore = 0;
+    } else {
+      const result = zxcvbn(password);
+      this.passwordStrengthScore = result.score;
+    }
+  }
+
+  getStrengthColor(score: number): string {
+    switch (score) {
+      case 0:
+        return 'red';
+      case 1:
+        return 'orange';
+      case 2:
+        return 'yellow';
+      case 3:
+        return 'lightgreen';
+      case 4:
+        return 'green';
+      default:
+        return 'transparent';
     }
   }
 }

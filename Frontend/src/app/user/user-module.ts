@@ -7,6 +7,8 @@ import { RegisterSuccessDialogComponent } from './register-success-dialog/regist
 import { ActivateAccountComponent } from './activate-account/activate-account.component';
 import { LoginComponent } from './login/login.component';
 import { RouterLink } from '@angular/router';
+import { RegisterCaComponent } from './register-ca/register-ca.component';
+import { ActivateAccountCaComponent } from './activate-account-ca/activate-account-ca.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +16,8 @@ import { RouterLink } from '@angular/router';
     RegisterSuccessDialogComponent,
     ActivateAccountComponent,
     LoginComponent,
+    RegisterCaComponent,
+    ActivateAccountCaComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, HttpClientModule, RouterLink],
   exports: [RouterLink],

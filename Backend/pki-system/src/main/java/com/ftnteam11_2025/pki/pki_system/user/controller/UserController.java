@@ -25,9 +25,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(registerRequestDTO));
     }
 
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/register/ca")
+    public ResponseEntity<Boolean> registerCA(@Valid @ModelAttribute CARegisterRequestDTO registerRequestDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerCA(registerRequestDTO));
+    }
+
     @PostMapping("/activate")
     public ResponseEntity<Void> activateAccount(@Valid @RequestBody VerificationCodeDTO dto) {
         authService.activateAccount(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/activate/ca")
+    public ResponseEntity<Void> activateAccount(@Valid @RequestBody CASetPasswordRequest dto) {
+        authService.activateAccountCA(dto);
         return ResponseEntity.noContent().build();
     }
 
@@ -35,6 +47,7 @@ public class UserController {
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         return ResponseEntity.ok(authService.login(loginRequestDTO));
     }
+
 
     @Secured("ROLE_ADMIN")
     @GetMapping

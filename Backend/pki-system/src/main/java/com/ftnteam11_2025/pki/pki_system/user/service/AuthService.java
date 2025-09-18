@@ -80,6 +80,27 @@ public class AuthService {
         );
     }
 
+    public boolean registerCA(@Valid CARegisterRequestDTO registerRequestDTO) {
+        if(accountRepository.existsByEmail(registerRequestDTO.getEmail())) {
+            throw new InvalidRequestError("Email address is already taken");
+        }
+        User user = userService.createUser(registerRequestDTO);
+
+        RegistrationRequest registrationRequest =RegistrationRequest.builder()
+                .email(registerRequestDTO.getEmail())
+                .password(passwordEncoder.encode(""))
+                .user(user)
+                .expirationTime(Instant.now().plus(activationTimeLimit))
+                .verificationCode(VerificationCodeGenerator.generateVerificationCode(VERIFICATION_CODE_LENGTH))
+                .build();
+
+
+        emailService.sendAccountActivationEmailCA(registrationRequest);
+        registrationRequestRepository.save(registrationRequest);
+
+        return true;
+    }
+
     @Transactional
     public void activateAccount(@Valid VerificationCodeDTO dto) {
         RegistrationRequest registrationRequest
@@ -108,7 +129,38 @@ public class AuthService {
         registrationRequestRepository.delete(registrationRequest);
     }
 
+    @Transactional
+    public void activateAccountCA(@Valid CASetPasswordRequest dto) {
+        RegistrationRequest registrationRequest
+                = registrationRequestRepository.findByVerificationCode(dto.getVerificationCode())
+                .orElseThrow(() -> new NotFoundError("Activation code invalid or expired"));
+
+        if (accountRepository.existsByEmail(registrationRequest.getEmail())) {
+            throw new InvalidRequestError("Email address is already taken");
+        }
+
+        if (registrationRequest.getExpirationTime().isBefore(Instant.now())) {
+            registrationRequestRepository.delete(registrationRequest);
+            throw new NotFoundError("Activation code invalid or expired");
+        }
+
+        registrationRequest.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        Account account = Account.builder()
+                .email(registrationRequest.getEmail())
+                .password(registrationRequest.getPassword())
+                .user(registrationRequest.getUser())
+                .status(AccountStatus.ACTIVE)
+                .build();
+
+        registrationRequest.getUser().setAccount(account);
+
+        accountRepository.save(account);
+        registrationRequestRepository.delete(registrationRequest);
+    }
+
     public LoginResponseDTO login(@Valid LoginRequestDTO loginRequestDTO) {
+        String password = passwordEncoder.encode(loginRequestDTO.getPassword());
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
 

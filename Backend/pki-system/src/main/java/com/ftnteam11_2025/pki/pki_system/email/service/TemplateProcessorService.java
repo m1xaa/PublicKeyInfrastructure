@@ -5,4 +5,6 @@ import org.springframework.stereotype.Service;
 
 public interface TemplateProcessorService {
     String getAccountActivationEmailBody(ActivationEmailBodyDTO dto);
+
+    String getAccountActivationEmailCABody(ActivationEmailBodyDTO bodyDTO);
 }

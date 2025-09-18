@@ -20,7 +20,6 @@ public class OrganizationController {
 
     private final IOrganizationService organizationService;
 
-    @Secured("ROLE_ADMIN")
     @GetMapping
     public ResponseEntity<List<OrganizationResponseDTO>> getAllOrganization(){
         return ResponseEntity.ok(organizationService.getAllOrganization());

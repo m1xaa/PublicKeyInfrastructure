@@ -5,6 +5,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../environment/environment';
 import { ErrorResponse } from '../../shared/model/error.response.model';
 import { RegisterResponse } from '../model/register.response.model';
+import { RegisterCARequest } from '../model/register.request.ca.model';
 
 @Injectable({
   providedIn: 'root',
@@ -16,14 +17,32 @@ export class RegisterService {
     const formData = new FormData();
     formData.append('firstName', registerRequest.firstName);
     formData.append('lastName', registerRequest.lastName);
-    formData.append('organizationName', registerRequest.organizationName);
+    formData.append(
+      'organizationId',
+      registerRequest.organizationId.toString()
+    );
     formData.append('email', registerRequest.email);
     formData.append('password', registerRequest.password);
+    formData.append('userRole', registerRequest.userRole);
+    return this.httpClient
+      .post<RegisterResponse>(
+        environment.apiHost + '/api/user/register',
+        formData
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  registerCA(registerRequest: RegisterCARequest) {
+    const formData = new FormData();
+    formData.append('firstName', registerRequest.firstName);
+    formData.append('lastName', registerRequest.lastName);
+    formData.append('organizationId', registerRequest.organizationId);
+    formData.append('email', registerRequest.email);
     formData.append('userRole', registerRequest.userRole);
 
     return this.httpClient
       .post<RegisterResponse>(
-        environment.apiHost + '/api/user/register',
+        environment.apiHost + '/api/user/register/ca',
         formData
       )
       .pipe(catchError(this.handleError));
@@ -33,6 +52,18 @@ export class RegisterService {
     return this.httpClient
       .post<void>(environment.apiHost + '/api/user/activate', {
         verificationCode: activationCode,
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  activateCaAccount(
+    activationCode: string,
+    password: string
+  ): Observable<void> {
+    return this.httpClient
+      .post<void>(environment.apiHost + '/api/user/activate/ca', {
+        verificationCode: activationCode,
+        password: password,
       })
       .pipe(catchError(this.handleError));
   }

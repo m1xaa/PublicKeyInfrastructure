@@ -29,4 +29,16 @@ public class EmailGeneratorService {
         return new EmailDTO(email, "Activate your Account at Event Planner", body);
     }
 
+    public EmailDTO getAccountActivationEmailCA(RegistrationRequest registrationRequest) {
+        final String email = registrationRequest.getEmail();
+        final String activationUrl = frontendUrl + "/user/activate/ca?code=" + registrationRequest.getVerificationCode();
+        final ActivationEmailBodyDTO bodyDTO = new ActivationEmailBodyDTO(
+                registrationRequest.getUser().getFirstName(),
+                registrationRequest.getUser().getLastName(),
+                activationUrl
+        );
+        final String body = templateProcessorService.getAccountActivationEmailCABody(bodyDTO);
+
+        return new EmailDTO(email, "Activate your Account at Event Planner", body);
+    }
 }

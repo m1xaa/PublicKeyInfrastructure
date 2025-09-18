@@ -93,6 +93,10 @@ export class AuthService {
   }
 
   logOut() {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+
     this.setUser(null);
     this.setJwt(null);
     this.setRefreshToken(null);
