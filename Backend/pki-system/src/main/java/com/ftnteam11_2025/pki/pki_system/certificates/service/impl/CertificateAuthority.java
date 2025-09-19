@@ -23,12 +23,18 @@ import com.ftnteam11_2025.pki.pki_system.util.exception.BadRequestError;
 import com.ftnteam11_2025.pki.pki_system.util.exception.NotFoundError;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.time.ZoneId;
@@ -258,5 +264,16 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     @Override
     public List<CertificateResponseDTO> getParentCertificate(){
         return certificateAuthorityRepository.findAllByStatusAndTypeNot(CertificateStatus.Active, CertificateType.EndEntity).stream().map(certificateMapper::toCertificateResponseDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Resource downloadCertificateAuthority(UUID id) throws Exception {
+        com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthority = certificateAuthorityRepository.findById(id).orElseThrow(()-> new BadRequestError("Certificate not found"));
+        Path path = Paths.get(certificateAuthority.getKsFilePath());
+        Resource resource = new FileSystemResource(path);
+        if (!resource.exists()) {
+            throw new NotFoundError("Certificate failed download");
+        }
+        return resource;
     }
 }

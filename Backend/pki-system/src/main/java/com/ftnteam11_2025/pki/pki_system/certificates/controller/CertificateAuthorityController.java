@@ -5,12 +5,17 @@ import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseDTO
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateAuthorityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/certificate")
@@ -28,5 +33,14 @@ public class CertificateAuthorityController {
     @GetMapping("/parent")
     public ResponseEntity<List<CertificateResponseDTO>> getAllParent() {
         return ResponseEntity.ok(certificateAuthorityService.getParentCertificate());
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> download(@PathVariable("id") UUID id) throws Exception {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"keystore.jks\"")
+                .body(certificateAuthorityService.downloadCertificateAuthority(id));
     }
 }
