@@ -5,10 +5,12 @@ import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateStatus;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateType;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.Issuer;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateUtilsService;
+import com.ftnteam11_2025.pki.pki_system.organization.dto.CreateOrganizationRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.mapper.OrganizationMapper;
 import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import com.ftnteam11_2025.pki.pki_system.organization.repository.OrganizationRepository;
+import com.ftnteam11_2025.pki.pki_system.organization.service.impl.OrganizationService;
 import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrganizationService;
 import com.ftnteam11_2025.pki.pki_system.user.model.User;
 import com.ftnteam11_2025.pki.pki_system.user.model.UserRole;
@@ -33,16 +35,18 @@ public class CertificateUtilsService implements ICertificateUtilsService {
     private final KeyStoreReader keyStoreReader;
     private final KeyStoreWriter keyStoreWriter;
     private final OrganizationMapper organizationMapper;
+    private final IOrganizationService organizationService;
 
     @Value("${security.master-key}")
     private String masterKey;
 
-    public CertificateUtilsService(UserRepository userRepository, OrganizationRepository organizationRepository , KeyStoreReader keyStoreReader, KeyStoreWriter keyStoreWriter, OrganizationMapper organizationMapper) {
+    public CertificateUtilsService(UserRepository userRepository, OrganizationRepository organizationRepository , KeyStoreReader keyStoreReader, KeyStoreWriter keyStoreWriter, OrganizationMapper organizationMapper, IOrganizationService organizationService) {
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
         this.organizationMapper = organizationMapper;
         this.keyStoreReader = keyStoreReader;
         this.keyStoreWriter = keyStoreWriter;
+        this.organizationService = organizationService;
     }
 
     @Transactional
@@ -50,32 +54,13 @@ public class CertificateUtilsService implements ICertificateUtilsService {
     public Organization saveTransfer(String organizationName, PrivateKey pk, X509Certificate certificate, CertificateType type, String alias, String ksFilePath) throws Exception {
         String keyStorePassword;
         String privateKeyPassword;
-        String encryptedKeyStorePassword;
-        String encryptedPrivateKeyPassword;
 
         Organization organization;
         if(type == CertificateType.RootCA){
             Optional<Organization> organizationFound = organizationRepository.findByName(organizationName);
-            if(organizationFound.isPresent()) {
-                organization = organizationFound.get();
-                keyStorePassword = CryptoUtils.decrypt(organization.getEncryptedKeyStorePassword(), masterKey);
-                privateKeyPassword = CryptoUtils.decrypt(organization.getEncryptedPrivateKeyPassword(), masterKey);
-            }else{
-                keyStorePassword = PasswordUtils.generateRandomPassword(24);
-                privateKeyPassword = PasswordUtils.generateRandomPassword(24);
-                // 2. encrypt passwords
-                encryptedKeyStorePassword = CryptoUtils.encrypt(keyStorePassword, masterKey);
-                encryptedPrivateKeyPassword = CryptoUtils.encrypt(privateKeyPassword, masterKey);
-                OrganizationRequestDTO organizationRequestDTO = OrganizationRequestDTO.builder()
-                        .name(organizationName)
-                        .encryptedKeyStorePassword(encryptedKeyStorePassword)
-                        .encryptedPrivateKeyPassword(encryptedPrivateKeyPassword)
-                        .build();
-                if(organizationRequestDTO.getName().length() < 2){
-                    throw new BadRequestError("Organization name is too short");
-                }
-                organization = organizationRepository.save(organizationMapper.toOrganization(organizationRequestDTO));
-            }
+            organization = organizationFound.orElseGet(() -> organizationMapper.toEntity(organizationService.create(new CreateOrganizationRequestDTO(organizationName))));
+            keyStorePassword = CryptoUtils.decrypt(organization.getEncryptedKeyStorePassword(), masterKey);
+            privateKeyPassword = CryptoUtils.decrypt(organization.getEncryptedPrivateKeyPassword(), masterKey);
 
         }else{
             organization = organizationRepository.findByName(organizationName).orElseThrow(() -> new NotFoundError("Organization not found"));

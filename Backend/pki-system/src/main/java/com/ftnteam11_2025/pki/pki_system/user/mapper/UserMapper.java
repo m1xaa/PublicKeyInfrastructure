@@ -21,5 +21,6 @@ public interface UserMapper {
 
 
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "organizationName", source = "organization.name")
     UserResponseDTO toResponseDTO(User user);
 }

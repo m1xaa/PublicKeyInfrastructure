@@ -89,6 +89,9 @@ public class OrganizationService implements IOrganizationService {
     @Override
     public OrganizationResponseDTO create(CreateOrganizationRequestDTO dto) {
         try {
+            if(dto.getName().length() < 2){
+                throw new BadRequestError("Organization name must be at least 2 characters");
+            }
             String keyStorePassword = PasswordUtils.generateRandomPassword(24);
             String privateKeyPassword = PasswordUtils.generateRandomPassword(24);
             String encryptedKeyStorePassword = CryptoUtils.encrypt(keyStorePassword, masterKey);

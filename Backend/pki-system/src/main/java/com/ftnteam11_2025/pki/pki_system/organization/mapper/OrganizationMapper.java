@@ -14,4 +14,7 @@ public interface OrganizationMapper {
 
     @Mapping(source = "id", target = "id")
     OrganizationResponseDTO toOrganizationResponseDTO(Organization organization);
+
+    @Mapping(source = "id", target = "id")
+    Organization toEntity(OrganizationResponseDTO organizationResponseDTO);
 }

@@ -24,14 +24,14 @@ public class CertificateGenerator implements ICertificateGenerator {
 
     // subject == issuer
     @Override
-    public X509Certificate generateRootCa(X500Name subject, KeyPair keyPair, Date validFrom, Date validTo) throws Exception {
+    public X509Certificate generateRootCa(Issuer issuer, Date validFrom, Date validTo) throws Exception {
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
-                subject,
+                issuer.getX500Name(),
                 BigInteger.valueOf(System.currentTimeMillis()),
                 validFrom,
                 validTo,
-                subject, // issuer = subject
-                keyPair.getPublic()
+                issuer.getX500Name(), // issuer = subject
+                issuer.getPublicKey()
         );
         // extensions
         certBuilder.addExtension(
@@ -41,7 +41,7 @@ public class CertificateGenerator implements ICertificateGenerator {
         );
 
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA")
-                .build(keyPair.getPrivate());
+                .build(issuer.getPrivateKey());
 
         return new JcaX509CertificateConverter()
                 .getCertificate(certBuilder.build(signer));

@@ -93,7 +93,8 @@ public class CertificateAuthority implements ICertificateAuthorityService {
 
         // 2. create subject and issuer
         X500Name x500Name = DistinguishedNameMapper.buildX500Name(requestDTO.getCommonName(), requestDTO.getSurname(), requestDTO.getGivenName(), requestDTO.getOrganization(), requestDTO.getOrganizationalUnit(),requestDTO.getCountry(), requestDTO.getEmail());
-        Subject subject = Subject.builder()
+        Issuer issuer = Issuer.builder()
+                .privateKey(keyPair.getPrivate())
                 .publicKey(keyPair.getPublic())
                 .x500Name(x500Name)
                 .build();
@@ -106,7 +107,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         }
 
         // 4. generateRootCa certificate
-        X509Certificate rootCaCert = certificateGenerator.generateRootCa(subject.getX500Name(), keyPair, validFrom, validTo);
+        X509Certificate rootCaCert = certificateGenerator.generateRootCa(issuer, validFrom, validTo);
         String alias = "cert_" + rootCaCert.getSerialNumber();
         String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
 

@@ -20,6 +20,7 @@ public class OrganizationController {
 
     private final IOrganizationService organizationService;
 
+
     @GetMapping
     public ResponseEntity<List<OrganizationResponseDTO>> getAllOrganization(){
         return ResponseEntity.ok(organizationService.getAllOrganization());
