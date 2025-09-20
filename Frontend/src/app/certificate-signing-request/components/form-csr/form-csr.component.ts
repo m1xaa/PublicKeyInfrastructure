@@ -7,6 +7,7 @@ import { CertificateResponse } from '../../../generate-certificate/model/certifi
 import { CertificateSigningRequestDTO } from '../../model/certificate-signing-request-dto';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { futureDateValidator } from '../../../shared/functions/ValidateStartEndDate';
 
 @Component({
   selector: 'app-form-csr',
@@ -42,7 +43,7 @@ export class FormCsrComponent {
     this.form = this.fb.group({
       mode: ['autogenerate', Validators.required],
       caUser: ['', Validators.required],
-      validTo: ['', Validators.required],
+      validTo: ['', [Validators.required, futureDateValidator]],
       commonName: ['', Validators.required],
       organization: [{value:'', disabled: true}, Validators.required],
       orgUnit: ['', Validators.required],
@@ -124,7 +125,16 @@ export class FormCsrComponent {
       });
     }
     else {
-      console.log("Not yet implemented");
+      const data = new FormData();
+      data.append("caCertificateId", this.form.get("caUser")?.value);
+      data.append("validTo", this.form.get("validTo")?.value);
+      data.append("pemFile", this.form.get("pemFile")?.value);
+      this.certificateService.createCSRSelfgenerate(this.authService.getUser()!.userId, data).subscribe({
+        next: () => {
+          this.toast.success("Successfully created certificate");
+          this.router.navigate(["/"]);
+        }
+      });
     }
   }
 }

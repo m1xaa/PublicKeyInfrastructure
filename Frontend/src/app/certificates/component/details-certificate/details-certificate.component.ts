@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {CertificateDetailsDTO} from '../../model/CertificateDetailsDTO';
-import {DatePipe} from '@angular/common';
+import { DatePipe, NgIf } from '@angular/common';
 import {LucideAngularModule} from 'lucide-angular';
 import {ActivatedRoute} from '@angular/router';
 import {CertificateServiceService} from '../../../generate-certificate/service/certificate-service.service';
@@ -11,8 +11,9 @@ import {ToastrService} from 'ngx-toastr';
   standalone: true,
   imports: [
     DatePipe,
-    LucideAngularModule
-  ],
+    LucideAngularModule,
+    NgIf
+],
   templateUrl: './details-certificate.component.html',
   styleUrl: './details-certificate.component.css'
 })

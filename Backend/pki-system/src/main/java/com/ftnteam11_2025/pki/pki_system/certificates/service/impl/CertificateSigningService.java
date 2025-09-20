@@ -16,11 +16,21 @@ import com.ftnteam11_2025.pki.pki_system.user.service.UserService;
 import com.ftnteam11_2025.pki.pki_system.util.exception.BadRequestError;
 import com.ftnteam11_2025.pki.pki_system.util.exception.NotFoundError;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.StringReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -64,5 +74,65 @@ public class CertificateSigningService implements ICertificateSigningService {
         certificateAuthorityService.createCertificateAuthority(createCertificateRequest);
 
     }
+
+    @Override
+    public void createCSRSelfgenerate(Long userId, String caCertificateId, String validTo, MultipartFile pemFile) {
+        try {
+
+            String pemContent = new String(pemFile.getBytes());
+
+
+            PEMParser pemParser = new PEMParser(new StringReader(pemContent));
+            Object obj = pemParser.readObject();
+            pemParser.close();
+
+            if (!(obj instanceof PKCS10CertificationRequest csr)) {
+                throw new BadRequestError("Invalid CSR format");
+            }
+
+
+            X500Name subject = csr.getSubject();
+
+            String commonName = getRdnValue(subject, BCStyle.CN);
+            String surname = getRdnValue(subject, BCStyle.SURNAME);
+            String givenName = getRdnValue(subject, BCStyle.GIVENNAME);
+            String organizationName = getRdnValue(subject, BCStyle.O);
+            String organizationalUnit = getRdnValue(subject, BCStyle.OU);
+            String country = getRdnValue(subject, BCStyle.C);
+            String email = getRdnValue(subject, BCStyle.E);
+
+            User owner = userService.findById(userId);
+
+            CertificateRequestDTO createCertificateRequest = new CertificateRequestDTO(
+                    commonName,
+                    surname != null ? surname : owner.getLastName(),
+                    givenName != null ? givenName : owner.getFirstName(),
+                    organizationName != null ? organizationName : owner.getOrganization().getName(),
+                    organizationalUnit,
+                    country,
+                    email,
+                    userId,
+                    LocalDate.now(),
+                    LocalDate.parse(validTo),
+                    UUID.fromString(caCertificateId),
+                    CertificateType.EndEntity,
+                    List.of()
+            );
+
+            certificateAuthorityService.createCertificateAuthority(createCertificateRequest);
+
+        } catch (Exception e) {
+            throw new BadRequestError("Failed to process CSR: " + e.getMessage());
+        }
+    }
+
+    private String getRdnValue(X500Name x500Name, ASN1ObjectIdentifier oid) {
+        RDN[] rdns = x500Name.getRDNs(oid);
+        if (rdns != null && rdns.length > 0) {
+            return IETFUtils.valueToString(rdns[0].getFirst().getValue());
+        }
+        return null;
+    }
+
 }
 

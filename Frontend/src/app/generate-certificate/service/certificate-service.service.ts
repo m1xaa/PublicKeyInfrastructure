@@ -48,7 +48,12 @@ export class CertificateServiceService {
   }
 
   createCSRAutogenerate(userId: number, request: CertificateSigningRequestDTO): Observable<void> {
-    return this.http.post<void>(`${environment.apiHost}/api/certificates/for-user/${userId}`, request)
+    return this.http.post<void>(`${environment.apiHost}/api/certificates/csr-autogenerate/for-user/${userId}`, request)
+      .pipe(catchError(handleHttpError));
+  }
+
+  createCSRSelfgenerate(userId: number, request: FormData): Observable<void> {
+    return this.http.post<void>(`${environment.apiHost}/api/certificates/csr-selfgenerate/for-user/${userId}`, request)
       .pipe(catchError(handleHttpError));
   }
 

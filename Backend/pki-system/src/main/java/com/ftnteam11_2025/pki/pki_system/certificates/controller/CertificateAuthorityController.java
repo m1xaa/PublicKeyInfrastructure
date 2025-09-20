@@ -14,6 +14,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -68,12 +69,23 @@ public class CertificateAuthorityController {
         return ResponseEntity.ok(certificateAuthorityService.getCertificateDetails(id));
     }
 
-    @PostMapping("/for-user/{userId}")
+    @PostMapping("/csr-autogenerate/for-user/{userId}")
     public ResponseEntity<Void> createCSRAutogenerate(
             @RequestBody CertificateSigningRequestDTO request,
             @PathVariable Long userId
     ) throws Exception {
         certificateSigningService.createCSRAutogenerate(userId, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/csr-selfgenerate/for-user/{userId}")
+    public ResponseEntity<Void> createCSRSelfgenerate(
+            @PathVariable Long userId,
+            @RequestParam String caCertificateId,
+            @RequestParam String validTo,
+            @RequestParam MultipartFile pemFile
+    )  {
+        certificateSigningService.createCSRSelfgenerate(userId, caCertificateId, validTo, pemFile);
         return ResponseEntity.noContent().build();
     }
 
