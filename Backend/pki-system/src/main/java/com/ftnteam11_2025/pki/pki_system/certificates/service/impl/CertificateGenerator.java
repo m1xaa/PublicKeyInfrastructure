@@ -1,5 +1,6 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.service.impl;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.ExtensionDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.Issuer;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.Subject;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateGenerator;
@@ -24,7 +25,7 @@ public class CertificateGenerator implements ICertificateGenerator {
 
     // subject == issuer
     @Override
-    public X509Certificate generateRootCa(Issuer issuer, Date validFrom, Date validTo) throws Exception {
+    public X509Certificate generateRootCa(Issuer issuer, Date validFrom, Date validTo, ExtensionDTO extensionDTO) throws Exception {
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuer.getX500Name(),
                 BigInteger.valueOf(System.currentTimeMillis()),
@@ -48,7 +49,7 @@ public class CertificateGenerator implements ICertificateGenerator {
     }
 
     @Override
-    public X509Certificate generateIntermediateCa(Subject subject, Issuer issuer, Date validFrom, Date validTo) throws Exception {
+    public X509Certificate generateIntermediateCa(Subject subject, Issuer issuer, Date validFrom, Date validTo, ExtensionDTO extensionDTO) throws Exception {
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuer.getX500Name(),
                 BigInteger.valueOf(System.currentTimeMillis()),
@@ -72,7 +73,7 @@ public class CertificateGenerator implements ICertificateGenerator {
     }
 
     @Override
-    public X509Certificate generateEndEntity(Subject subject, Issuer issuer, Date validFrom, Date validTo) throws Exception {
+    public X509Certificate generateEndEntity(Subject subject, Issuer issuer, Date validFrom, Date validTo, ExtensionDTO extensionDTO) throws Exception {
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuer.getX500Name(),
                 BigInteger.valueOf(System.currentTimeMillis()),

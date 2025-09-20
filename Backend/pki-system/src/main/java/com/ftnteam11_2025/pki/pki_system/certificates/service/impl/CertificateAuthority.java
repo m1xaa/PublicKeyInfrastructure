@@ -1,9 +1,6 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.service.impl;
 
-import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateDetailsDTO;
-import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateRequestDTO;
-import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseCard;
-import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.*;
 import com.ftnteam11_2025.pki.pki_system.certificates.mappers.DistinguishedNameMapper.DistinguishedNameMapper;
 import com.ftnteam11_2025.pki.pki_system.certificates.mappers.certificate.CertificateMapper;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateStatus;
@@ -110,7 +107,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         }
 
         // 4. generateRootCa certificate
-        X509Certificate rootCaCert = certificateGenerator.generateRootCa(issuer, validFrom, validTo);
+        X509Certificate rootCaCert = certificateGenerator.generateRootCa(issuer, validFrom, validTo, requestDTO.getExtensions());
         String alias = "cert_" + rootCaCert.getSerialNumber();
         String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
 
@@ -165,7 +162,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         certificateUtilsService.validateRequest(certificateAuthority, validFrom, validTo);
 
         // 4. create certificate
-        X509Certificate caCertificate = certificateGenerator.generateIntermediateCa(subject, issuer, validFrom, validTo);
+        X509Certificate caCertificate = certificateGenerator.generateIntermediateCa(subject, issuer, validFrom, validTo, requestDTO.getExtensions());
         String alias = "cert_" + caCertificate.getSerialNumber();
         String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
 
@@ -228,7 +225,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         certificateUtilsService.validateRequest(iss, validFrom, validTo);
 
         // 4. certificate
-        X509Certificate endEntityCer = certificateGenerator.generateEndEntity(subject, issuer, validFrom, validTo);
+        X509Certificate endEntityCer = certificateGenerator.generateEndEntity(subject, issuer, validFrom, validTo, requestDTO.getExtensions());
         String alias = "cert_" + endEntityCer.getSerialNumber();
         String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
         // 5. organization
