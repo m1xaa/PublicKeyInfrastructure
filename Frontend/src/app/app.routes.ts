@@ -12,6 +12,7 @@ import { ActivateAccountCaComponent } from './user/activate-account-ca/activate-
 import { ApproveUsersComponent } from './user/ca/approve-users/approve-users.component';
 import {ListCertificateComponent} from './certificates/component/list-certificate/list-certificate.component';
 import {DetailsCertificateComponent} from './certificates/component/details-certificate/details-certificate.component';
+import { FormCsrComponent } from './certificate-signing-request/components/form-csr/form-csr.component';
 
 export const routes: Routes = [
   {
@@ -65,6 +66,11 @@ export const routes: Routes = [
   {
     path: 'certificates',
     component: FormCertificateComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'certificate-signing-request',
+    component: FormCsrComponent,
     canActivate: [authGuard],
   },
   {

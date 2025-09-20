@@ -1,11 +1,9 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.controller;
 
-import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateDetailsDTO;
-import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateRequestDTO;
-import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseCard;
-import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.*;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateAuthorityService;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateSigningService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -14,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CertificateAuthorityController {
     private final ICertificateAuthorityService certificateAuthorityService;
+    private final ICertificateSigningService certificateSigningService;
 
     // CA
     @Secured({"ROLE_ADMIN", "ROLE_CA"})
@@ -66,5 +66,19 @@ public class CertificateAuthorityController {
     @GetMapping("/{id}")
     public ResponseEntity<CertificateDetailsDTO> getCertificateDetails(@PathVariable("id") UUID id) throws Exception {
         return ResponseEntity.ok(certificateAuthorityService.getCertificateDetails(id));
+    }
+
+    @PostMapping("/for-user/{userId}")
+    public ResponseEntity<Void> createCSRAutogenerate(
+            @RequestBody CertificateSigningRequestDTO request,
+            @PathVariable Long userId
+    ) throws Exception {
+        certificateSigningService.createCSRAutogenerate(userId, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<OrganizationCACertificatesResponseDTO> getCACertificatesByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(certificateSigningService.getOrganizationCACertificates(userId));
     }
 }

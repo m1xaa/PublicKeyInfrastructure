@@ -7,6 +7,8 @@ import {handleHttpError} from '../../shared/error-handle/httpHandle';
 import {CertificateRequestDTO} from '../model/certificate-request';
 import {CertificateResponseDTO} from '../../certificates/model/CertificateResponseDTO';
 import {CertificateDetailsDTO} from '../../certificates/model/CertificateDetailsDTO';
+import { OrganizationCACertificatesResponseDTO } from '../../certificate-signing-request/model/organization-ca-certificates-response-dto';
+import { CertificateSigningRequestDTO } from '../../certificate-signing-request/model/certificate-signing-request-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -40,10 +42,21 @@ export class CertificateServiceService {
       .pipe(catchError(handleHttpError));
   }
 
+  getCACertificatesByUser(userId: number): Observable<OrganizationCACertificatesResponseDTO> {
+    return this.http.get<OrganizationCACertificatesResponseDTO>(`${environment.apiHost}/api/certificates/by-user/${userId}`)
+      .pipe(catchError(handleHttpError));
+  }
+
+  createCSRAutogenerate(userId: number, request: CertificateSigningRequestDTO): Observable<void> {
+    return this.http.post<void>(`${environment.apiHost}/api/certificates/for-user/${userId}`, request)
+      .pipe(catchError(handleHttpError));
+  }
+
   downloadKeyStore(certificateId: string) {
     console.log(certificateId);
     // MUST BE 'http://localhost:8080/', DO NOT USE .env
-    return this.http.get<Blob>(`http://localhost:8080/api/certificates/${certificateId}/download`, {
+    // Switched to env and works now
+    return this.http.get<Blob>(`${environment.apiHost}/api/certificates/${certificateId}/download`, {
       responseType: 'blob' as 'json',
     });
   }

@@ -1,6 +1,7 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.dto;
 
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateType;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class CertificateRequestDTO {
     private String commonName;
     private String surname;

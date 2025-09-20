@@ -32,6 +32,16 @@ public class UserService {
         return userRepository.findAllByRoleNot(UserRole.ADMINISTRATOR).stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
     }
 
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundError("User with id " + id + " not found"));
+    }
+
+    public Organization findOrganizationByUserId(Long id) {
+        return userRepository.findOrganizationByUserId(id)
+                .orElseThrow(() -> new NotFoundError("User with id " + id + " not found"));
+    }
+
     public List<UserResponseDTO> getAllUsersByOrganization(String name) {
         Organization organization = organizationRepository.findByName(name).orElseThrow(()->new NotFoundError("Organization not found"));
         return userRepository.findAllByRoleNotAndOrganization(UserRole.ADMINISTRATOR, organization).stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
