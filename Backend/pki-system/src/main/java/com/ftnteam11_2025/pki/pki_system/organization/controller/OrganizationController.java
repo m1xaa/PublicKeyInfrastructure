@@ -3,6 +3,7 @@ package com.ftnteam11_2025.pki.pki_system.organization.controller;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.CreateOrganizationRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationHierarchy;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationResponseDTO;
+import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationResponseMinDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrganizationService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +23,11 @@ public class OrganizationController {
 
 
     @GetMapping
-    public ResponseEntity<List<OrganizationResponseDTO>> getAllOrganization(){
-        return ResponseEntity.ok(organizationService.getAllOrganization());
+    public ResponseEntity<List<OrganizationResponseMinDTO>> getAllOrganization(){
+        return ResponseEntity.ok(organizationService.getAll());
     }
 
+    // CA
     @Secured("ROLE_ADMIN")
     @GetMapping("/hierarchy")
     public ResponseEntity<List<OrganizationHierarchy>> getOrganizationHierarchy(){
@@ -37,4 +39,5 @@ public class OrganizationController {
     public ResponseEntity<OrganizationResponseDTO> createOrganization(@ModelAttribute CreateOrganizationRequestDTO dto){
         return ResponseEntity.ok(organizationService.create(dto));
     }
+
 }

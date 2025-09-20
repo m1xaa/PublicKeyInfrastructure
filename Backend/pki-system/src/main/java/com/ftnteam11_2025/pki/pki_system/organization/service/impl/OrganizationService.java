@@ -43,8 +43,8 @@ public class OrganizationService implements IOrganizationService {
     }
 
     @Override
-    public List<OrganizationResponseDTO> getAllOrganization() {
-        return organizationRepository.findAll().stream().map(organizationMapper::toOrganizationResponseDTO).collect(Collectors.toList());
+    public List<OrganizationResponseMinDTO> getAll() {
+        return organizationRepository.findAll().stream().map(organizationMapper::toOrganizationResponseMinDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -109,5 +109,6 @@ public class OrganizationService implements IOrganizationService {
         }
 
     }
+
 
 }

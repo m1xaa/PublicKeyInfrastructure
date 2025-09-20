@@ -121,10 +121,10 @@ public class CertificateUtilsService implements ICertificateUtilsService {
             throw new BadRequestError("Issuer must be RootCA or CA");
         }
         if(validFrom.before(certificateAuthority.getValidFrom())){
-            throw new BadRequestError("Child certificate cannot start before issuer’s validFrom");
+            throw new BadRequestError("Child certificate cannot start before issuer’s start date");
         }
         if(validTo.after(certificateAuthority.getValidTo())){
-            throw new BadRequestError("Child certificate cannot end after issuer’s validTo");
+            throw new BadRequestError("Child certificate cannot end after issuer’s ed date");
         }
         if(certificateAuthority.getStatus() != CertificateStatus.Active){
             throw new BadRequestError("Child certificate status must be Active");

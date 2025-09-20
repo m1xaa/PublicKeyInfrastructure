@@ -2,6 +2,7 @@ package com.ftnteam11_2025.pki.pki_system.organization.mapper;
 
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationResponseDTO;
+import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationResponseMinDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,4 +18,7 @@ public interface OrganizationMapper {
 
     @Mapping(source = "id", target = "id")
     Organization toEntity(OrganizationResponseDTO organizationResponseDTO);
+
+    @Mapping(source = "id", target = "id")
+    OrganizationResponseMinDTO toOrganizationResponseMinDTO(Organization organization);
 }

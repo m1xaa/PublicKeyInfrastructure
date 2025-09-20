@@ -4,13 +4,14 @@ import { ActivateAccountComponent } from './user/activate-account/activate-accou
 import { LoginComponent } from './user/login/login.component';
 import { unauthenticatedGuard } from './infrastructure/auth/guard/unauthenticated.guard';
 import { NotFoundComponent } from './layout/not-found/not-found/not-found.component';
-import { ListCertificateComponent } from './generate-certificate/component/list-certificate/list-certificate.component';
 import { FormCertificateComponent } from './generate-certificate/component/form-certificate/form-certificate.component';
 import { authGuard } from './infrastructure/auth/guard/auth.guard';
 import { HomePageComponent } from './home-page/home-page.component';
 import { RegisterCaComponent } from './user/register-ca/register-ca.component';
 import { ActivateAccountCaComponent } from './user/activate-account-ca/activate-account-ca.component';
 import { ApproveUsersComponent } from './user/ca/approve-users/approve-users.component';
+import {ListCertificateComponent} from './certificates/component/list-certificate/list-certificate.component';
+import {DetailsCertificateComponent} from './certificates/component/details-certificate/details-certificate.component';
 
 export const routes: Routes = [
   {
@@ -55,6 +56,11 @@ export const routes: Routes = [
     component: ListCertificateComponent,
     canActivate: [authGuard],
     data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'certificate/:id',
+    component: DetailsCertificateComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'certificates',

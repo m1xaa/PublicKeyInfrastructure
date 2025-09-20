@@ -1,6 +1,8 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateDetailsDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateRequestDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseCard;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateType;
@@ -20,4 +22,6 @@ public interface ICertificateAuthorityService {
     public CertificateResponseDTO createCertificateAuthority(CertificateRequestDTO requestDTO) throws Exception;
     public List<CertificateResponseDTO> getParentCertificate();
     public Resource downloadCertificateAuthority(UUID id) throws Exception;
+    public List<CertificateResponseCard> getCertificates();
+    public CertificateDetailsDTO getCertificateDetails(UUID id) throws Exception;
 }

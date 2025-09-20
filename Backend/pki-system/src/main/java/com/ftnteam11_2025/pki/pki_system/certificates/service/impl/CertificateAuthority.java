@@ -1,6 +1,8 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.service.impl;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateDetailsDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateRequestDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseCard;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.mappers.DistinguishedNameMapper.DistinguishedNameMapper;
 import com.ftnteam11_2025.pki.pki_system.certificates.mappers.certificate.CertificateMapper;
@@ -275,5 +277,28 @@ public class CertificateAuthority implements ICertificateAuthorityService {
             throw new NotFoundError("Certificate failed download");
         }
         return resource;
+    }
+
+    @Override
+    public List<CertificateResponseCard> getCertificates() {
+        List<CertificateResponseCard> res = new ArrayList<>();
+        List<com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority> resEntity = certificateAuthorityRepository.findAll();
+        for(com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority cer : resEntity){
+            CertificateResponseCard item = CertificateResponseCard.builder()
+                    .id(cer.getId())
+                    .email(cer.getOwner().getAccount().getEmail())
+                    .validFrom(cer.getValidFrom())
+                    .validTo(cer.getValidTo())
+                    .status(cer.getStatus())
+                    .commonName(cer.getCommon_name())
+                    .build();
+            res.add(item);
+        }
+        return res;
+    }
+
+    @Override
+    public CertificateDetailsDTO getCertificateDetails(UUID id) throws Exception {
+        return null;
     }
 }

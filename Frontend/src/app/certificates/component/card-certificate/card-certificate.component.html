@@ -1,0 +1,57 @@
+<div class="flex items-center justify-center bg-primary-200 p-6">
+  <a
+    [routerLink]="['/certificate/', certificate.id]"
+    class="block w-full max-w-md rounded-2xl shadow-md p-6 bg-primary-100 border border-primary-300
+           hover:shadow-lg transition-shadow duration-200 flex flex-col gap-4 text-inherit no-underline"
+  >
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-semibold text-text-800">
+        {{ certificate.commonName }}
+      </h2>
+
+      <span
+              class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium text-white"
+              [ngClass]="{
+          'bg-green-600': certificate.status.toString() === 'Active',
+          'bg-red-600': certificate.status.toString() === 'Expired',
+          'bg-yellow-600': certificate.status.toString() === 'Revoked'
+        }"
+            >
+        <ng-container [ngSwitch]=certificate.status.toString()>
+          <lucide-icon *ngSwitchCase="'Active'" name="check-circle" class="w-4 h-4"></lucide-icon>
+          <lucide-icon *ngSwitchCase="'Expired'" name="x-circle" class="w-4 h-4"></lucide-icon>
+          <lucide-icon *ngSwitchCase="'Revoked'" name="alert-circle" class="w-4 h-4"></lucide-icon>
+        </ng-container>
+              {{ certificate.status }}
+      </span>
+
+
+    </div>
+
+    <div class="flex items-center">
+      <lucide-icon name="mail" class="w-5 h-5 mr-3 text-secondary-500"></lucide-icon>
+      <span class="text-text-800 font-medium break-all">{{ certificate.email }}</span>
+    </div>
+
+    <div class="flex gap-6">
+      <div class="flex items-center">
+        <lucide-icon name="calendar" class="w-5 h-5 mr-2 text-secondary-500"></lucide-icon>
+        <div>
+          <span class="text-sm text-text-600">Valid From</span>
+          <div class="text-text-800 font-medium">
+            {{ certificate.validFrom | date:'mediumDate' }}
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <lucide-icon name="calendar" class="w-5 h-5 mr-2 text-secondary-500"></lucide-icon>
+        <div>
+          <span class="text-sm text-text-600">Valid To</span>
+          <div class="text-text-800 font-medium">
+            {{ certificate.validTo | date:'mediumDate' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </a>
+</div>

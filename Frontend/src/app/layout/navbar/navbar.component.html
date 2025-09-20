@@ -4,17 +4,32 @@
   <div
     class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
   >
-    <a
-      class="flex items-center space-x-3 rtl:space-x-reverse"
-      routerLink="/"
-      [routerLinkActiveOptions]="{ exact: true }"
-      routerLinkActive="text-secondary-400"
-    >
+    @if(isAdmin$){
+      <a
+        class="flex items-center space-x-3 rtl:space-x-reverse"
+        routerLink="/admin-panel"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="text-secondary-400"
+      >
+        <span
+          class="self-center text-2xl font-semibold whitespace-nowrap text-white"
+          >PKI system</span
+        >
+      </a>
+    } @else {
+      <a
+        class="flex items-center space-x-3 rtl:space-x-reverse"
+        routerLink="/"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="text-secondary-400"
+      >
       <span
         class="self-center text-2xl font-semibold whitespace-nowrap text-white"
-        >PKI system</span
+      >PKI system</span
       >
-    </a>
+      </a>
+    }
+
 
     <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
       @if ((loggedIn$|async)) {
@@ -71,7 +86,7 @@
       >
         <li>
           <a
-            routerLink="/"
+            routerLink="/admin-panel"
             [routerLinkActiveOptions]="{ exact: true }"
             routerLinkActive="underline"
             class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
