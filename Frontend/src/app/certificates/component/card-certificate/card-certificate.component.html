@@ -53,6 +53,7 @@
 
   <!-- Revoke button inside card but does not trigger navigation -->
   <button
+    [class.disabled]="isAlreadyRevoked()"
     *ngIf="enableRevoking"
     (click)="openRevokeModal($event)"
     class="mt-4 px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"

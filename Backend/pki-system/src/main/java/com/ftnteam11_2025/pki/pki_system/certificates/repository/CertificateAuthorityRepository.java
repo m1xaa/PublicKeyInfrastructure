@@ -18,6 +18,7 @@ public interface CertificateAuthorityRepository extends JpaRepository<Certificat
     List<CertificateAuthority> findAllByOrganization(Organization organization);
     List<CertificateAuthority> findAllByStatusAndTypeNotAndOrganization(CertificateStatus status, CertificateType type, Organization organization);
     List<CertificateAuthority> findAllByOwner(User owner);
+    List<CertificateAuthority> findAllByIssuer(CertificateAuthority issuer);
     @Query("""
     SELECT new com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseCard(
     c.id,

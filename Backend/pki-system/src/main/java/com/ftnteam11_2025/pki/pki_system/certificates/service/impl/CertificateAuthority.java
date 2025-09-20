@@ -120,6 +120,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         // 6. save certificate to db
         com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthority = com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority.builder()
                 .common_name(requestDTO.getCommonName())
+                .serialNumber(String.valueOf(rootCaCert.getSerialNumber()))
                 .distinguishedName(DistinguishedNameMapper.toDistinguishedNameString(x500Name))
                 .validFrom(validFrom)
                 .validTo(validTo)
@@ -175,6 +176,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         // 6. DB
         com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthoritySave = com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority.builder()
                 .common_name(requestDTO.getCommonName())
+                .serialNumber(String.valueOf(caCertificate.getSerialNumber()))
                 .distinguishedName(DistinguishedNameMapper.toDistinguishedNameString(subject.getX500Name()))
                 .validFrom(validFrom)
                 .validTo(validTo)
@@ -244,6 +246,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         // 6. DB
         com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthority = com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority.builder()
                 .common_name(requestDTO.getCommonName())
+                .serialNumber(String.valueOf(endEntityCer.getSerialNumber()))
                 .distinguishedName(DistinguishedNameMapper.toDistinguishedNameString(subject.getX500Name()))
                 .validFrom(validFrom)
                 .validTo(validTo)

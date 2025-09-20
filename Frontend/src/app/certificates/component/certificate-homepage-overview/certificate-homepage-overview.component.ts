@@ -30,6 +30,10 @@ export class CertificateHomepageOverviewComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadCertificates();
+  }
+
+  loadCertificates() {
     this.certificateService.getCertificateOverviewByUserId(this.authService.getUser()!.userId).subscribe({
       next: (certs) => {
         this.certificates = certs;
@@ -49,6 +53,7 @@ export class CertificateHomepageOverviewComponent implements OnInit {
     this.certificateService.revokeCertificate(id, {reason: reason}).subscribe({
       next: () => {
         this.toastr.success("Certificate revoked successfully");
+        this.loadCertificates();
       }
     });
   }

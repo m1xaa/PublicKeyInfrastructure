@@ -4,6 +4,7 @@ import com.ftnteam11_2025.pki.pki_system.certificates.dto.*;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateAuthorityService;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateOverviewService;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateRevocationService;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateSigningService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
@@ -28,6 +29,7 @@ public class CertificateAuthorityController {
     private final ICertificateAuthorityService certificateAuthorityService;
     private final ICertificateSigningService certificateSigningService;
     private final ICertificateOverviewService certificateOverviewService;
+    private final ICertificateRevocationService certificateRevocationService;
 
     // CA
     @Secured({"ROLE_ADMIN", "ROLE_CA"})
@@ -102,8 +104,8 @@ public class CertificateAuthorityController {
     }
 
     @PostMapping("/{id}/revoke")
-    public ResponseEntity<Void> revoke(@PathVariable("id") UUID id, @RequestBody RevokeCertificateDTO request) {
-        System.out.println(request);
+    public ResponseEntity<Void> revoke(@PathVariable("id") UUID id, @RequestBody RevokeCertificateDTO request) throws Exception {
+        certificateRevocationService.revokeCertificate(id, request);
         return ResponseEntity.noContent().build();
     }
 }

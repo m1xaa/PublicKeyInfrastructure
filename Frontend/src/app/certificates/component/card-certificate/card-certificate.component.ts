@@ -7,6 +7,7 @@ import { RevocationReason } from '../../model/revocation-reason';
 import { FormsModule } from '@angular/forms';
 import { CertificateServiceService } from '../../../generate-certificate/service/certificate-service.service';
 import { ToastrService } from 'ngx-toastr';
+import { CertificateStatus } from '../../model/CertificateStatus';
 
 @Component({
   selector: 'app-card-certificate',
@@ -48,6 +49,10 @@ export class CardCertificateComponent {
   closeRevokeModal() {
     this.showRevokeModal = false;
     this.selectedReason = null;
+  }
+
+  isAlreadyRevoked() {
+    return this.certificate.status == CertificateStatus.Revoked;
   }
 
   confirmRevoke() {
