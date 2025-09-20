@@ -1,5 +1,6 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateDetailsDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateType;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.Issuer;
@@ -22,5 +23,6 @@ public interface ICertificateUtilsService {
     Issuer getIssuer(CertificateAuthority certificateAuthority, String orgName) throws Exception;
 
     User validateUser(Long userId, CertificateType requestedType, CertificateType validateType);
-    public void validateRequest(CertificateAuthority certificateAuthority, Date validFrom, Date validTo) throws Exception;
+    void validateRequest(CertificateAuthority certificateAuthority, Date validFrom, Date validTo) throws Exception;
+    CertificateDetailsDTO getCertificate(CertificateAuthority cer) throws Exception;
 }

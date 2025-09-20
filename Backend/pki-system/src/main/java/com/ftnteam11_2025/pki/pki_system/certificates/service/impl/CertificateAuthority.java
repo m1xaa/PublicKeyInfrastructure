@@ -299,6 +299,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
 
     @Override
     public CertificateDetailsDTO getCertificateDetails(UUID id) throws Exception {
-        return null;
+        com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority cer = certificateAuthorityRepository.findById(id).orElseThrow(()-> new BadRequestError("Certificate not found"));
+        return certificateUtilsService.getCertificate(cer);
     }
 }

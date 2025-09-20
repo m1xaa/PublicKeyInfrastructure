@@ -28,7 +28,7 @@ public class OrganizationController {
     }
 
     // CA
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
     @GetMapping("/hierarchy")
     public ResponseEntity<List<OrganizationHierarchy>> getOrganizationHierarchy(){
         return ResponseEntity.ok(organizationService.getOrganizationHierarchy());

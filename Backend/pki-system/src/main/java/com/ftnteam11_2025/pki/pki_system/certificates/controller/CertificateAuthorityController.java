@@ -1,5 +1,6 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.controller;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateDetailsDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseCard;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseDTO;
@@ -25,14 +26,14 @@ public class CertificateAuthorityController {
     private final ICertificateAuthorityService certificateAuthorityService;
 
     // CA
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
     @PostMapping
     public ResponseEntity<CertificateResponseDTO> create(@RequestBody CertificateRequestDTO req) throws Exception {
         return ResponseEntity.ok(certificateAuthorityService.createCertificateAuthority(req));
     }
 
     // CA
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
     @GetMapping("/parent")
     public ResponseEntity<List<CertificateResponseDTO>> getAllParent() {
         return ResponseEntity.ok(certificateAuthorityService.getParentCertificate());
@@ -52,5 +53,12 @@ public class CertificateAuthorityController {
     @GetMapping
     public ResponseEntity<List<CertificateResponseCard>> getAll() {
         return ResponseEntity.ok(certificateAuthorityService.getCertificates());
+    }
+
+
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
+    @GetMapping("/{id}")
+    public ResponseEntity<CertificateDetailsDTO> getCertificateDetails(@PathVariable("id") UUID id) throws Exception {
+        return ResponseEntity.ok(certificateAuthorityService.getCertificateDetails(id));
     }
 }

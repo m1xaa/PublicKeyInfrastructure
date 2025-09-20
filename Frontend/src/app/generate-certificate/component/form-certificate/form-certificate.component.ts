@@ -83,6 +83,7 @@ export class FormCertificateComponent {
       const certIdControl = this.form.get('certificateId')!;
       if (type === 'CA' || type === 'EndEntity') {
         certIdControl.setValidators([Validators.required]);
+        this.getParentCertificates();
       } else {
         certIdControl.clearValidators();
         certIdControl.reset();
@@ -90,7 +91,6 @@ export class FormCertificateComponent {
       certIdControl.updateValueAndValidity();
     });
     this.getAllUsers();
-    this.getParentCertificates();
     this.getAllOrganizations();
     this.getOrganizationHierarchy();
   }
@@ -163,7 +163,6 @@ export class FormCertificateComponent {
         console.log(cert);
         this.toast.success('Certificate generated successfully!', 'Success');
         this.form.reset();
-        this.getParentCertificates();
         this.getAllOrganizations();
         this.getOrganizationHierarchy();
       },

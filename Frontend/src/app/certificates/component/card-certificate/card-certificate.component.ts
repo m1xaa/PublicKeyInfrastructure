@@ -27,8 +27,6 @@ export class CardCertificateComponent {
   }
 
   ngOnInit(): void {
-    console.log(this.certificate);
   }
 
-  protected readonly CertificateStatus = CertificateStatus;
 }

@@ -28,7 +28,6 @@ export class ListCertificateComponent {
   getCertificates(){
     this.certificateService.getAll().subscribe({
       next: (res) => {
-        console.log(res);
         this.certs = res;
       },
       error: (err) => {
