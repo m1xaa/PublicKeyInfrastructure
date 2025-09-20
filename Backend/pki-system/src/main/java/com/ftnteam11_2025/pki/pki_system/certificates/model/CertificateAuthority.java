@@ -26,6 +26,8 @@ public class CertificateAuthority {
     @NotNull
     private String common_name;
 
+    private String serialNumber;
+
     @Column(name="distinguished_name", columnDefinition="TEXT", nullable=false)
     private String distinguishedName;
 

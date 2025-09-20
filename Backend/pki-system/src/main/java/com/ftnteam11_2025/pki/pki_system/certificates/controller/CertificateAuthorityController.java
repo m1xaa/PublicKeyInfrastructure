@@ -6,6 +6,7 @@ import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertif
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateOverviewService;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateSigningService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -64,7 +65,7 @@ public class CertificateAuthorityController {
         return ResponseEntity.ok(certificateAuthorityService.getCertificates());
     }
 
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<CertificateDetailsDTO> getCertificateDetails(@PathVariable("id") UUID id) throws Exception {
         return ResponseEntity.ok(certificateAuthorityService.getCertificateDetails(id));
@@ -98,5 +99,11 @@ public class CertificateAuthorityController {
     @GetMapping("/overview/by-user/{userId}")
     public ResponseEntity<List<CertificateResponseCard>> getCertificateOverviewByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(certificateOverviewService.getCertificatesByUserId(userId));
+    }
+
+    @PostMapping("/{id}/revoke")
+    public ResponseEntity<Void> revoke(@PathVariable("id") UUID id, @RequestBody RevokeCertificateDTO request) {
+        System.out.println(request);
+        return ResponseEntity.noContent().build();
     }
 }

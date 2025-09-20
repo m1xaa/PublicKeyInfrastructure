@@ -14,7 +14,11 @@
   <div class="relative">
     <!-- Certificate Card -->
     <div class="flex items-start">
-      <app-card-certificate [certificate]="node" class="z-10"></app-card-certificate>
+      <app-card-certificate
+        [enableRevoking]="true" 
+        [certificate]="node" 
+        (onRevoke)="onRevoke($event, node.id)"
+      />
     </div>
 
     <!-- Children -->

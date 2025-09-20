@@ -4,6 +4,8 @@ import { AuthService } from '../../../infrastructure/service/auth.service';
 import { CertificateResponseDTO } from '../../model/CertificateResponseDTO';
 import { CardCertificateComponent } from "../card-certificate/card-certificate.component";
 import { NgForOf, NgIf, NgTemplateOutlet } from '@angular/common';
+import { RevocationReason } from '../../model/revocation-reason';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-certificate-homepage-overview',
@@ -23,7 +25,8 @@ export class CertificateHomepageOverviewComponent implements OnInit {
 
   constructor(
     private certificateService: CertificateServiceService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -40,5 +43,13 @@ export class CertificateHomepageOverviewComponent implements OnInit {
 
   getRoots(): CertificateResponseDTO[] {
     return this.certificates.filter(c => !c.issuerId);
+  }
+
+  onRevoke(reason: RevocationReason, id: string) {
+    this.certificateService.revokeCertificate(id, {reason: reason}).subscribe({
+      next: () => {
+        this.toastr.success("Certificate revoked successfully");
+      }
+    });
   }
 }

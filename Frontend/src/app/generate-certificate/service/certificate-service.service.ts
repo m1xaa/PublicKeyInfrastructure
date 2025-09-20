@@ -9,6 +9,7 @@ import {CertificateResponseDTO} from '../../certificates/model/CertificateRespon
 import {CertificateDetailsDTO} from '../../certificates/model/CertificateDetailsDTO';
 import { OrganizationCACertificatesResponseDTO } from '../../certificate-signing-request/model/organization-ca-certificates-response-dto';
 import { CertificateSigningRequestDTO } from '../../certificate-signing-request/model/certificate-signing-request-dto';
+import { RevokeCertificateDTO } from '../../certificates/model/revoke-certificate-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -59,6 +60,11 @@ export class CertificateServiceService {
 
   getCertificateOverviewByUserId(userId: number): Observable<CertificateResponseDTO[]> {
     return this.http.get<CertificateResponseDTO[]>(`${environment.apiHost}/api/certificates/overview/by-user/${userId}`)
+      .pipe(catchError(handleHttpError));
+  }
+
+  revokeCertificate(certificateId: string, request: RevokeCertificateDTO): Observable<void> {
+    return this.http.post<void>(`${environment.apiHost}/api/certificates/${certificateId}/revoke`, request)
       .pipe(catchError(handleHttpError));
   }
 
