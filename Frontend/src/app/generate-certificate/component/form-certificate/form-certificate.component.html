@@ -242,7 +242,7 @@
               >Parent Certificate</label
             >
             <select class="input w-full" formControlName="certificateId">
-              <option [ngValue]="null" disabled>Select Certificate</option>
+              <option value="" disabled selected>Select Certificate</option>
               <option
                 *ngFor="let c of existingCerts"
                 [ngValue]="c.certificateId"

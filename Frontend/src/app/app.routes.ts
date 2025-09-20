@@ -29,7 +29,7 @@ export const routes: Routes = [
   {
     path: 'user/register/ca',
     component: RegisterCaComponent,
-    canActivate: [roleGuard],
+    canActivate: [authGuard],
     data: { roles: ['ADMIN'] },
   },
   {
@@ -50,13 +50,13 @@ export const routes: Routes = [
   {
     path: 'user/approve',
     component: ApproveUsersComponent,
-    canActivate: [roleGuard],
+    canActivate: [authGuard],
     data: { roles: ['CA'] },
   },
   {
     path: 'admin-panel',
     component: ListCertificateComponent,
-    canActivate: [roleGuard],
+    canActivate: [authGuard],
     data: { roles: ['ADMIN'] },
   },
   {
