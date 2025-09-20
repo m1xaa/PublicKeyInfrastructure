@@ -1,5 +1,6 @@
 import {ExtensionDTO} from './cert-exntension';
 import {CertificateType} from './cert-type';
+import {Extensions} from './extensions';
 
 export interface CertificateRequestDTO {
   commonName: string;
@@ -17,5 +18,5 @@ export interface CertificateRequestDTO {
 
   certificateId?: string;   // UUID može biti opciono
   certificateType: CertificateType;
-  extensions?: ExtensionDTO[];
+  extensions?: Extensions;
 }

@@ -27,5 +27,5 @@ public class CertificateRequestDTO {
     private UUID certificateId;
 
     private CertificateType certificateType;
-    private List<ExtensionDTO> extensions;
+    private ExtensionDTO extensions;
 }
