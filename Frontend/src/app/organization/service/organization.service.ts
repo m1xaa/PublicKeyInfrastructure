@@ -29,6 +29,13 @@ export class OrganizationService {
       .pipe(catchError(handleHttpError));
   }
 
+  getHierarchyByOrganization(): Observable<OrganizationHierarchy> {
+    return this.http
+      .get<OrganizationHierarchy>(
+        `${environment.apiHost}/api/organizations/hierarchy/ca`
+      ).pipe(catchError(handleHttpError));
+  }
+
   createOrganization(name: string): Observable<OrganizationResponseDTO> {
     const formData = new FormData();
     formData.append('name', name);

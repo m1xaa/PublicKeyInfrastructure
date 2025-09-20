@@ -15,6 +15,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([jwtInterceptor])),
     provideAnimationsAsync(),
     provideToastr({ positionClass: 'toast-top-right' }),
-    importProvidersFrom(LucideAngularModule.pick({ Mail, Calendar, CheckCircle, XCircle, AlertCircle })),
+    importProvidersFrom(LucideAngularModule.pick({ Mail, Calendar, CheckCircle, XCircle, AlertCircle })), provideAnimationsAsync(),
   ],
 };

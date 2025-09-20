@@ -20,6 +20,11 @@ export class CertificateServiceService {
       .pipe(catchError(handleHttpError))
   }
 
+  getCertificatesParentByOrganization(name?:String): Observable<CertificateResponse[]> {
+    return this.http.get<CertificateResponse[]>(`${environment.apiHost}/api/certificates/parent/${name}`)
+      .pipe(catchError(handleHttpError))
+  }
+
   generateCertificate(req:CertificateRequestDTO): Observable<CertificateResponse> {
     return this.http.post<CertificateResponse>(`${environment.apiHost}/api/certificates`, req)
       .pipe(catchError(handleHttpError));

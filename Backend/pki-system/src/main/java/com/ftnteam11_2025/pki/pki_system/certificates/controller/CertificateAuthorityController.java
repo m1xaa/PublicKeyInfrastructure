@@ -39,6 +39,12 @@ public class CertificateAuthorityController {
         return ResponseEntity.ok(certificateAuthorityService.getParentCertificate());
     }
 
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
+    @GetMapping("/parent/{name}")
+    public ResponseEntity<List<CertificateResponseDTO>> getAllParent(@PathVariable String name) {
+        return ResponseEntity.ok(certificateAuthorityService.getParentCertificateByOrganization(name));
+    }
+
     // mogu svi download?
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> download(@PathVariable("id") UUID id) throws Exception {

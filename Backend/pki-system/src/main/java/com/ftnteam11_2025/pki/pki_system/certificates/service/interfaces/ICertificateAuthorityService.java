@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ICertificateAuthorityService {
-    public CertificateAuthority createRootCA(CertificateRequestDTO requestDTO) throws Exception;
-    public CertificateAuthority createCA(CertificateRequestDTO requestDTO) throws Exception;
-    public CertificateResponseDTO createCertificateAuthority(CertificateRequestDTO requestDTO) throws Exception;
-    public List<CertificateResponseDTO> getParentCertificate();
-    public Resource downloadCertificateAuthority(UUID id) throws Exception;
-    public List<CertificateResponseCard> getCertificates();
-    public CertificateDetailsDTO getCertificateDetails(UUID id) throws Exception;
+    CertificateAuthority createRootCA(CertificateRequestDTO requestDTO) throws Exception;
+    CertificateAuthority createCA(CertificateRequestDTO requestDTO) throws Exception;
+    CertificateResponseDTO createCertificateAuthority(CertificateRequestDTO requestDTO) throws Exception;
+    List<CertificateResponseDTO> getParentCertificate();
+    List<CertificateResponseDTO> getParentCertificateByOrganization(String name);
+    Resource downloadCertificateAuthority(UUID id) throws Exception;
+    List<CertificateResponseCard> getCertificates();
+    CertificateDetailsDTO getCertificateDetails(UUID id) throws Exception;
 }

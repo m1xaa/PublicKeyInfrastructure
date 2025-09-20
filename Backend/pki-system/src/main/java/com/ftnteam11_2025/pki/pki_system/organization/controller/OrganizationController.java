@@ -40,4 +40,10 @@ public class OrganizationController {
         return ResponseEntity.ok(organizationService.create(dto));
     }
 
+    @Secured("ROLE_CA")
+    @GetMapping("/hierarchy/ca")
+    public ResponseEntity<OrganizationHierarchy> getOrganizationById(){
+        return ResponseEntity.ok(organizationService.getOrganizationHierarchyByOrganization());
+    }
+
 }

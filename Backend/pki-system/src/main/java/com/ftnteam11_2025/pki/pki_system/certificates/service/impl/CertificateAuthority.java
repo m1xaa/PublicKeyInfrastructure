@@ -21,6 +21,7 @@ import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrgani
 import com.ftnteam11_2025.pki.pki_system.user.model.User;
 import com.ftnteam11_2025.pki.pki_system.user.model.UserRole;
 import com.ftnteam11_2025.pki.pki_system.user.repository.UserRepository;
+import com.ftnteam11_2025.pki.pki_system.user.service.AuthService;
 import com.ftnteam11_2025.pki.pki_system.util.exception.BadRequestError;
 import com.ftnteam11_2025.pki.pki_system.util.exception.NotFoundError;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -53,25 +54,19 @@ public class CertificateAuthority implements ICertificateAuthorityService {
 
     private final CertificateAuthorityRepository caRepository;
     private final ICertificateGenerator certificateGenerator;
-    private final IOrganizationService organizationService;
-    private final KeyStoreReader keyStoreReader;
-    private final KeyStoreWriter keyStoreWriter;
-    private final UserRepository userRepository;
     private final CertificateMapper certificateMapper;
     private final ICertificateUtilsService certificateUtilsService;
+    private final AuthService authService;
 
-    public CertificateAuthority(CertificateAuthorityRepository caRepository, ICertificateGenerator certificateGenerator, IOrganizationService organizationService, KeyStoreReader keyStoreReader, KeyStoreWriter keyStoreWriter, UserRepository userRepository, CertificateAuthorityRepository certificateAuthorityRepository, OrganizationRepository organizationRepository,
-                                CertificateMapper certificateMapper, ICertificateUtilsService certificateUtilsService) {
+    public CertificateAuthority(CertificateAuthorityRepository caRepository, ICertificateGenerator certificateGenerator, CertificateAuthorityRepository certificateAuthorityRepository, OrganizationRepository organizationRepository,
+                                CertificateMapper certificateMapper, ICertificateUtilsService certificateUtilsService, AuthService authService) {
         this.caRepository = caRepository;
         this.certificateGenerator = certificateGenerator;
-        this.organizationService = organizationService;
-        this.keyStoreReader = keyStoreReader;
-        this.keyStoreWriter = keyStoreWriter;
-        this.userRepository = userRepository;
         this.certificateAuthorityRepository = certificateAuthorityRepository;
-        this.organizationRepository = organizationRepository;
         this.certificateMapper = certificateMapper;
         this.certificateUtilsService = certificateUtilsService;
+        this.authService = authService;
+        this.organizationRepository = organizationRepository;
     }
 
     @Transactional
@@ -143,6 +138,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     @Transactional
     @Override
     public com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority createCA(CertificateRequestDTO requestDTO) throws Exception {
+
         // 0. validate owner, typeC
         User user = certificateUtilsService.validateUser(requestDTO.getUserId(), requestDTO.getCertificateType(), CertificateType.CA);
 
@@ -269,6 +265,12 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     }
 
     @Override
+    public List<CertificateResponseDTO> getParentCertificateByOrganization(String name) {
+        Organization organization = organizationRepository.findByName(name).orElseThrow(()-> new BadRequestError("Organization not found"));
+        return certificateAuthorityRepository.findAllByStatusAndTypeNotAndOrganization(CertificateStatus.Active, CertificateType.EndEntity, organization).stream().map(certificateMapper::toCertificateResponseDTO).collect(Collectors.toList());
+    }
+
+    @Override
     public Resource downloadCertificateAuthority(UUID id) throws Exception {
         com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthority = certificateAuthorityRepository.findById(id).orElseThrow(()-> new BadRequestError("Certificate not found"));
         Path path = Paths.get(certificateAuthority.getKsFilePath());
@@ -296,6 +298,8 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         }
         return res;
     }
+
+
 
     @Override
     public CertificateDetailsDTO getCertificateDetails(UUID id) throws Exception {
