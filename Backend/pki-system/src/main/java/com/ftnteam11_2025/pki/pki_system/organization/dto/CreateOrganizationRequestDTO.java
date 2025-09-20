@@ -4,6 +4,7 @@ import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class CreateOrganizationRequestDTO {
     private String name;
 }

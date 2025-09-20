@@ -16,4 +16,9 @@ export class UserServiceService {
     return this.http.get<UserResponse[]>(`${environment.apiHost}/api/user`)
       .pipe(catchError(handleHttpError))
   }
+
+  getAllUsersByOrganization(name?:String): Observable<UserResponse[]> {
+    return this.http.get<UserResponse[]>(`${environment.apiHost}/api/user/${name}`)
+      .pipe(catchError(handleHttpError))
+  }
 }

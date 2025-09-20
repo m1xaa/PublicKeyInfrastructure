@@ -54,4 +54,10 @@ public class UserController {
     public ResponseEntity<List<UserResponseDTO>> getAll(){
         return ResponseEntity.ok(userService.getAllUsers());
     }
+
+    @Secured("ROLE_CA")
+    @GetMapping("/{name}")
+    public ResponseEntity<List<UserResponseDTO>> getAllByOrganization(@PathVariable String name){
+        return ResponseEntity.ok(userService.getAllUsersByOrganization(name));
+    }
 }

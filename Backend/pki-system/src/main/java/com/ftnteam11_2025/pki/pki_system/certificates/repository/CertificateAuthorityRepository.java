@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface CertificateAuthorityRepository extends JpaRepository<CertificateAuthority, UUID> {
     List<CertificateAuthority> findAllByStatusAndTypeNot(CertificateStatus status, CertificateType type);
     List<CertificateAuthority> findAllByOrganization(Organization organization);
+    List<CertificateAuthority> findAllByStatusAndTypeNotAndOrganization(CertificateStatus status, CertificateType type, Organization organization);
 }

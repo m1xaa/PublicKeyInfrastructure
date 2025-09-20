@@ -1,14 +1,18 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.service.impl;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateDetailsDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.SubjectIssuerDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateStatus;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateType;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.Issuer;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateUtilsService;
+import com.ftnteam11_2025.pki.pki_system.organization.dto.CreateOrganizationRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.mapper.OrganizationMapper;
 import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import com.ftnteam11_2025.pki.pki_system.organization.repository.OrganizationRepository;
+import com.ftnteam11_2025.pki.pki_system.organization.service.impl.OrganizationService;
 import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrganizationService;
 import com.ftnteam11_2025.pki.pki_system.user.model.User;
 import com.ftnteam11_2025.pki.pki_system.user.model.UserRole;
@@ -20,11 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class CertificateUtilsService implements ICertificateUtilsService {
@@ -33,16 +35,18 @@ public class CertificateUtilsService implements ICertificateUtilsService {
     private final KeyStoreReader keyStoreReader;
     private final KeyStoreWriter keyStoreWriter;
     private final OrganizationMapper organizationMapper;
+    private final IOrganizationService organizationService;
 
     @Value("${security.master-key}")
     private String masterKey;
 
-    public CertificateUtilsService(UserRepository userRepository, OrganizationRepository organizationRepository , KeyStoreReader keyStoreReader, KeyStoreWriter keyStoreWriter, OrganizationMapper organizationMapper) {
+    public CertificateUtilsService(UserRepository userRepository, OrganizationRepository organizationRepository , KeyStoreReader keyStoreReader, KeyStoreWriter keyStoreWriter, OrganizationMapper organizationMapper, IOrganizationService organizationService) {
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
         this.organizationMapper = organizationMapper;
         this.keyStoreReader = keyStoreReader;
         this.keyStoreWriter = keyStoreWriter;
+        this.organizationService = organizationService;
     }
 
     @Transactional
@@ -50,32 +54,13 @@ public class CertificateUtilsService implements ICertificateUtilsService {
     public Organization saveTransfer(String organizationName, PrivateKey pk, X509Certificate certificate, CertificateType type, String alias, String ksFilePath) throws Exception {
         String keyStorePassword;
         String privateKeyPassword;
-        String encryptedKeyStorePassword;
-        String encryptedPrivateKeyPassword;
 
         Organization organization;
         if(type == CertificateType.RootCA){
             Optional<Organization> organizationFound = organizationRepository.findByName(organizationName);
-            if(organizationFound.isPresent()) {
-                organization = organizationFound.get();
-                keyStorePassword = CryptoUtils.decrypt(organization.getEncryptedKeyStorePassword(), masterKey);
-                privateKeyPassword = CryptoUtils.decrypt(organization.getEncryptedPrivateKeyPassword(), masterKey);
-            }else{
-                keyStorePassword = PasswordUtils.generateRandomPassword(24);
-                privateKeyPassword = PasswordUtils.generateRandomPassword(24);
-                // 2. encrypt passwords
-                encryptedKeyStorePassword = CryptoUtils.encrypt(keyStorePassword, masterKey);
-                encryptedPrivateKeyPassword = CryptoUtils.encrypt(privateKeyPassword, masterKey);
-                OrganizationRequestDTO organizationRequestDTO = OrganizationRequestDTO.builder()
-                        .name(organizationName)
-                        .encryptedKeyStorePassword(encryptedKeyStorePassword)
-                        .encryptedPrivateKeyPassword(encryptedPrivateKeyPassword)
-                        .build();
-                if(organizationRequestDTO.getName().length() < 2){
-                    throw new BadRequestError("Organization name is too short");
-                }
-                organization = organizationRepository.save(organizationMapper.toOrganization(organizationRequestDTO));
-            }
+            organization = organizationFound.orElseGet(() -> organizationMapper.toEntity(organizationService.create(new CreateOrganizationRequestDTO(organizationName))));
+            keyStorePassword = CryptoUtils.decrypt(organization.getEncryptedKeyStorePassword(), masterKey);
+            privateKeyPassword = CryptoUtils.decrypt(organization.getEncryptedPrivateKeyPassword(), masterKey);
 
         }else{
             organization = organizationRepository.findByName(organizationName).orElseThrow(() -> new NotFoundError("Organization not found"));
@@ -136,13 +121,43 @@ public class CertificateUtilsService implements ICertificateUtilsService {
             throw new BadRequestError("Issuer must be RootCA or CA");
         }
         if(validFrom.before(certificateAuthority.getValidFrom())){
-            throw new BadRequestError("Child certificate cannot start before issuer’s validFrom");
+            throw new BadRequestError("Child certificate cannot start before issuer’s start date");
         }
         if(validTo.after(certificateAuthority.getValidTo())){
-            throw new BadRequestError("Child certificate cannot end after issuer’s validTo");
+            throw new BadRequestError("Child certificate cannot end after issuer’s ed date");
         }
         if(certificateAuthority.getStatus() != CertificateStatus.Active){
             throw new BadRequestError("Child certificate status must be Active");
         }
+    }
+
+    @Override
+    public CertificateDetailsDTO getCertificate(CertificateAuthority cer) throws Exception {
+        Organization organization = cer.getOrganization();
+        String alias = cer.getAlias();
+        String ksFilePath = cer.getKsFilePath();
+        String encryptedKSPassword = organization.getEncryptedKeyStorePassword();
+        String keyStorePassword = CryptoUtils.decrypt(encryptedKSPassword, masterKey);
+
+        keyStoreWriter.loadKeyStore(ksFilePath, keyStorePassword.toCharArray());
+        Certificate certificate = keyStoreReader.readCertificate(ksFilePath, keyStorePassword, alias);
+        if(certificate instanceof X509Certificate x509Certificate){
+            SubjectIssuerDTO issuer = CertificateUtils.getIssuerOrSubject(x509Certificate, true);
+            SubjectIssuerDTO subject = CertificateUtils.getIssuerOrSubject(x509Certificate, false);
+            byte[] publicKeyEncoded = x509Certificate.getPublicKey().getEncoded();
+            String publicKeyBase64 = Base64.getEncoder().encodeToString(publicKeyEncoded);
+            return CertificateDetailsDTO.builder()
+                    .id(cer.getId())
+                    .issuer(issuer)
+                    .subject(subject)
+                    .validFrom(x509Certificate.getNotBefore())
+                    .validTo(x509Certificate.getNotAfter())
+                    .certificateKey(CertificateUtils.getSHA256Fingerprint(x509Certificate))
+                    .publicKey(publicKeyBase64)
+                    .build();
+        }
+
+        throw new BadRequestError("Fetching certificate failed");
+
     }
 }

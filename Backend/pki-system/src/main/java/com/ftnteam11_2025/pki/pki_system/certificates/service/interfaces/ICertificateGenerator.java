@@ -10,7 +10,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 public interface ICertificateGenerator {
-    X509Certificate generateRootCa(X500Name subject, KeyPair keyPair, Date validFrom, Date validTo) throws Exception;
+    X509Certificate generateRootCa(Issuer issuer, Date validFrom, Date validTo) throws Exception;
     public X509Certificate generateIntermediateCa(
             Subject subject, Issuer issuer, Date validFrom, Date validTo
     ) throws Exception;

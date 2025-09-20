@@ -3,6 +3,7 @@ package com.ftnteam11_2025.pki.pki_system.organization.controller;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.CreateOrganizationRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationHierarchy;
 import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationResponseDTO;
+import com.ftnteam11_2025.pki.pki_system.organization.dto.OrganizationResponseMinDTO;
 import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrganizationService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,12 +21,14 @@ public class OrganizationController {
 
     private final IOrganizationService organizationService;
 
+
     @GetMapping
-    public ResponseEntity<List<OrganizationResponseDTO>> getAllOrganization(){
-        return ResponseEntity.ok(organizationService.getAllOrganization());
+    public ResponseEntity<List<OrganizationResponseMinDTO>> getAllOrganization(){
+        return ResponseEntity.ok(organizationService.getAll());
     }
 
-    @Secured("ROLE_ADMIN")
+    // CA
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
     @GetMapping("/hierarchy")
     public ResponseEntity<List<OrganizationHierarchy>> getOrganizationHierarchy(){
         return ResponseEntity.ok(organizationService.getOrganizationHierarchy());
@@ -36,4 +39,11 @@ public class OrganizationController {
     public ResponseEntity<OrganizationResponseDTO> createOrganization(@ModelAttribute CreateOrganizationRequestDTO dto){
         return ResponseEntity.ok(organizationService.create(dto));
     }
+
+    @Secured("ROLE_CA")
+    @GetMapping("/hierarchy/ca")
+    public ResponseEntity<OrganizationHierarchy> getOrganizationById(){
+        return ResponseEntity.ok(organizationService.getOrganizationHierarchyByOrganization());
+    }
+
 }

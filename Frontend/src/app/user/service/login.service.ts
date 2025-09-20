@@ -16,7 +16,7 @@ export class LoginService {
     private httpClient: HttpClient
   ) {}
 
-  login(email: string, password: string): Observable<void> {
+  login(email: string, password: string): Observable<LoginResponse> {
     return this.httpClient
       .post<LoginResponse>(environment.apiHost + '/api/user/login', {
         email,
@@ -37,9 +37,9 @@ export class LoginService {
           console.log(response.jwt);
           console.log(response.refreshToken);
         }),
-        catchError(this.handleError),
-        map(() => void 0)
+        catchError(this.handleError)
       );
+
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {

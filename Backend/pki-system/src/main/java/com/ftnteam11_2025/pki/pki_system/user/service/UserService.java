@@ -7,8 +7,10 @@ import com.ftnteam11_2025.pki.pki_system.user.dto.RegisterRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.user.dto.UserResponseDTO;
 import com.ftnteam11_2025.pki.pki_system.user.mapper.UserMapper;
 import com.ftnteam11_2025.pki.pki_system.user.model.User;
+import com.ftnteam11_2025.pki.pki_system.user.model.UserRole;
 import com.ftnteam11_2025.pki.pki_system.user.repository.UserRepository;
 import com.ftnteam11_2025.pki.pki_system.util.exception.BadRequestError;
+import com.ftnteam11_2025.pki.pki_system.util.exception.NotFoundError;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,12 @@ public class UserService {
     private final OrganizationRepository organizationRepository;
 
     public List<UserResponseDTO> getAllUsers() {
-        return userRepository.findAll().stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
+        return userRepository.findAllByRoleNot(UserRole.ADMINISTRATOR).stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
+    }
+
+    public List<UserResponseDTO> getAllUsersByOrganization(String name) {
+        Organization organization = organizationRepository.findByName(name).orElseThrow(()->new NotFoundError("Organization not found"));
+        return userRepository.findAllByRoleNotAndOrganization(UserRole.ADMINISTRATOR, organization).stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
     }
 
     @Transactional

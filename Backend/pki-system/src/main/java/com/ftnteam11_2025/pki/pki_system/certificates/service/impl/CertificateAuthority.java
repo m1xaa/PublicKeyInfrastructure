@@ -1,6 +1,8 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.service.impl;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateDetailsDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateRequestDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseCard;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.mappers.DistinguishedNameMapper.DistinguishedNameMapper;
 import com.ftnteam11_2025.pki.pki_system.certificates.mappers.certificate.CertificateMapper;
@@ -19,16 +21,23 @@ import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrgani
 import com.ftnteam11_2025.pki.pki_system.user.model.User;
 import com.ftnteam11_2025.pki.pki_system.user.model.UserRole;
 import com.ftnteam11_2025.pki.pki_system.user.repository.UserRepository;
+import com.ftnteam11_2025.pki.pki_system.user.service.AuthService;
 import com.ftnteam11_2025.pki.pki_system.util.exception.BadRequestError;
 import com.ftnteam11_2025.pki.pki_system.util.exception.NotFoundError;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.time.ZoneId;
@@ -45,25 +54,19 @@ public class CertificateAuthority implements ICertificateAuthorityService {
 
     private final CertificateAuthorityRepository caRepository;
     private final ICertificateGenerator certificateGenerator;
-    private final IOrganizationService organizationService;
-    private final KeyStoreReader keyStoreReader;
-    private final KeyStoreWriter keyStoreWriter;
-    private final UserRepository userRepository;
     private final CertificateMapper certificateMapper;
     private final ICertificateUtilsService certificateUtilsService;
+    private final AuthService authService;
 
-    public CertificateAuthority(CertificateAuthorityRepository caRepository, ICertificateGenerator certificateGenerator, IOrganizationService organizationService, KeyStoreReader keyStoreReader, KeyStoreWriter keyStoreWriter, UserRepository userRepository, CertificateAuthorityRepository certificateAuthorityRepository, OrganizationRepository organizationRepository,
-                                CertificateMapper certificateMapper, ICertificateUtilsService certificateUtilsService) {
+    public CertificateAuthority(CertificateAuthorityRepository caRepository, ICertificateGenerator certificateGenerator, CertificateAuthorityRepository certificateAuthorityRepository, OrganizationRepository organizationRepository,
+                                CertificateMapper certificateMapper, ICertificateUtilsService certificateUtilsService, AuthService authService) {
         this.caRepository = caRepository;
         this.certificateGenerator = certificateGenerator;
-        this.organizationService = organizationService;
-        this.keyStoreReader = keyStoreReader;
-        this.keyStoreWriter = keyStoreWriter;
-        this.userRepository = userRepository;
         this.certificateAuthorityRepository = certificateAuthorityRepository;
-        this.organizationRepository = organizationRepository;
         this.certificateMapper = certificateMapper;
         this.certificateUtilsService = certificateUtilsService;
+        this.authService = authService;
+        this.organizationRepository = organizationRepository;
     }
 
     @Transactional
@@ -93,7 +96,8 @@ public class CertificateAuthority implements ICertificateAuthorityService {
 
         // 2. create subject and issuer
         X500Name x500Name = DistinguishedNameMapper.buildX500Name(requestDTO.getCommonName(), requestDTO.getSurname(), requestDTO.getGivenName(), requestDTO.getOrganization(), requestDTO.getOrganizationalUnit(),requestDTO.getCountry(), requestDTO.getEmail());
-        Subject subject = Subject.builder()
+        Issuer issuer = Issuer.builder()
+                .privateKey(keyPair.getPrivate())
                 .publicKey(keyPair.getPublic())
                 .x500Name(x500Name)
                 .build();
@@ -106,7 +110,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         }
 
         // 4. generateRootCa certificate
-        X509Certificate rootCaCert = certificateGenerator.generateRootCa(subject.getX500Name(), keyPair, validFrom, validTo);
+        X509Certificate rootCaCert = certificateGenerator.generateRootCa(issuer, validFrom, validTo);
         String alias = "cert_" + rootCaCert.getSerialNumber();
         String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
 
@@ -134,6 +138,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     @Transactional
     @Override
     public com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority createCA(CertificateRequestDTO requestDTO) throws Exception {
+
         // 0. validate owner, typeC
         User user = certificateUtilsService.validateUser(requestDTO.getUserId(), requestDTO.getCertificateType(), CertificateType.CA);
 
@@ -257,5 +262,48 @@ public class CertificateAuthority implements ICertificateAuthorityService {
     @Override
     public List<CertificateResponseDTO> getParentCertificate(){
         return certificateAuthorityRepository.findAllByStatusAndTypeNot(CertificateStatus.Active, CertificateType.EndEntity).stream().map(certificateMapper::toCertificateResponseDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CertificateResponseDTO> getParentCertificateByOrganization(String name) {
+        Organization organization = organizationRepository.findByName(name).orElseThrow(()-> new BadRequestError("Organization not found"));
+        return certificateAuthorityRepository.findAllByStatusAndTypeNotAndOrganization(CertificateStatus.Active, CertificateType.EndEntity, organization).stream().map(certificateMapper::toCertificateResponseDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Resource downloadCertificateAuthority(UUID id) throws Exception {
+        com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthority = certificateAuthorityRepository.findById(id).orElseThrow(()-> new BadRequestError("Certificate not found"));
+        Path path = Paths.get(certificateAuthority.getKsFilePath());
+        Resource resource = new FileSystemResource(path);
+        if (!resource.exists()) {
+            throw new NotFoundError("Certificate failed download");
+        }
+        return resource;
+    }
+
+    @Override
+    public List<CertificateResponseCard> getCertificates() {
+        List<CertificateResponseCard> res = new ArrayList<>();
+        List<com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority> resEntity = certificateAuthorityRepository.findAll();
+        for(com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority cer : resEntity){
+            CertificateResponseCard item = CertificateResponseCard.builder()
+                    .id(cer.getId())
+                    .email(cer.getOwner().getAccount().getEmail())
+                    .validFrom(cer.getValidFrom())
+                    .validTo(cer.getValidTo())
+                    .status(cer.getStatus())
+                    .commonName(cer.getCommon_name())
+                    .build();
+            res.add(item);
+        }
+        return res;
+    }
+
+
+
+    @Override
+    public CertificateDetailsDTO getCertificateDetails(UUID id) throws Exception {
+        com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority cer = certificateAuthorityRepository.findById(id).orElseThrow(()-> new BadRequestError("Certificate not found"));
+        return certificateUtilsService.getCertificate(cer);
     }
 }

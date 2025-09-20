@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { ErrorResponse } from '../../shared/model/error.response.model';
-import { finalize } from 'rxjs';
-import { LoginService } from '../service/login.service';
+import {Component} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+import {ToastrService} from 'ngx-toastr';
+import {ErrorResponse} from '../../shared/model/error.response.model';
+import {finalize} from 'rxjs';
+import {LoginService} from '../service/login.service';
+import {UserRole} from '../../infrastructure/auth/model/user-role.model';
 
 @Component({
   selector: 'app-login',
@@ -51,9 +52,15 @@ export class LoginComponent {
         .login(this.email?.value, this.password?.value)
         .pipe(finalize(() => (this.waitingResponse = false)))
         .subscribe({
-          next: () => {
+          next: (res) => {
             this.toastr.success("You've successfully logged in!", 'Success');
-            this.router.navigateByUrl('/');
+            console.log(res);
+            if(res.role === UserRole.Admin){
+              this.router.navigateByUrl('/admin-panel');
+            }else{
+              this.router.navigateByUrl('/');
+            }
+
           },
           error: (err: ErrorResponse) => {
             this.toastr.error(err.message, 'Oops!');
