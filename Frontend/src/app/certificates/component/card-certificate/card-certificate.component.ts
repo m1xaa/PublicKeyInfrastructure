@@ -18,7 +18,6 @@ import { CertificateStatus } from '../../model/CertificateStatus';
     NgSwitch,
     NgSwitchCase,
     LucideAngularModule,
-    RouterLink,
     NgIf,
     FormsModule,
     NgForOf

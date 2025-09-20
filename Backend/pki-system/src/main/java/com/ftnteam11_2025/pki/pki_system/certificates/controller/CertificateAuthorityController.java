@@ -1,21 +1,16 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.controller;
 
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.*;
-import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateAuthorityService;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateOverviewService;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateRevocationService;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateSigningService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -107,5 +102,19 @@ public class CertificateAuthorityController {
     public ResponseEntity<Void> revoke(@PathVariable("id") UUID id, @RequestBody RevokeCertificateDTO request) throws Exception {
         certificateRevocationService.revokeCertificate(id, request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/revocations")
+    public ResponseEntity<List<CertificateRevocationResponseDTO>> getAllRevocations(){
+        return ResponseEntity.ok(certificateRevocationService.getAll());
+    }
+
+    @GetMapping("/revocations/{id}/download")
+    public ResponseEntity<Resource> downloadRevocation(@PathVariable("id") UUID id) throws Exception {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"revocation.crl\"")
+                .body(certificateRevocationService.download(id));
     }
 }

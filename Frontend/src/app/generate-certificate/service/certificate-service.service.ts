@@ -10,6 +10,7 @@ import {CertificateDetailsDTO} from '../../certificates/model/CertificateDetails
 import { OrganizationCACertificatesResponseDTO } from '../../certificate-signing-request/model/organization-ca-certificates-response-dto';
 import { CertificateSigningRequestDTO } from '../../certificate-signing-request/model/certificate-signing-request-dto';
 import { RevokeCertificateDTO } from '../../certificates/model/revoke-certificate-dto';
+import { CertificateRevocationResponseDTO } from '../../certificates/model/certificate-revocation-response-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -68,11 +69,22 @@ export class CertificateServiceService {
       .pipe(catchError(handleHttpError));
   }
 
+  getAllRevocations(): Observable<CertificateRevocationResponseDTO[]> {
+    return this.http.get<CertificateRevocationResponseDTO[]>(`${environment.apiHost}/api/certificates/revocations`)
+      .pipe(catchError(handleHttpError));
+  }
+
   downloadKeyStore(certificateId: string) {
     console.log(certificateId);
     // MUST BE 'http://localhost:8080/', DO NOT USE .env
     // Switched to env and works now
     return this.http.get<Blob>(`${environment.apiHost}/api/certificates/${certificateId}/download`, {
+      responseType: 'blob' as 'json',
+    });
+  }
+
+  downloadCrl(id: string) {
+    return this.http.get<Blob>(`${environment.apiHost}/api/certificates/revocations/${id}/download`, {
       responseType: 'blob' as 'json',
     });
   }

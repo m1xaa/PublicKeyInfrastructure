@@ -14,6 +14,7 @@ import {ListCertificateComponent} from './certificates/component/list-certificat
 import {DetailsCertificateComponent} from './certificates/component/details-certificate/details-certificate.component';
 import { FormCsrComponent } from './certificate-signing-request/components/form-csr/form-csr.component';
 import { roleGuard } from './infrastructure/auth/guard/role.guard';
+import { CrlOverviewComponent } from './certificates/component/crl-overview/crl-overview.component';
 
 export const routes: Routes = [
   {
@@ -74,6 +75,11 @@ export const routes: Routes = [
     component: FormCsrComponent,
     canActivate: [roleGuard],
     data: { roles: ['REGULAR'] },
+  },
+  {
+    path: 'crl-overview',
+    component: CrlOverviewComponent,
+    canActivate: [authGuard]
   },
   {
     path: '**',
