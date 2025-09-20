@@ -8,12 +8,12 @@ import java.util.Map;
 @Getter
 @Setter
 public class ExtensionDTO {
-    private Integer pathLen;
-    private boolean basicConstraints; // Must in Root, CA
-    private boolean keyCertSign; // Must Root, CA
-    private boolean crlSign; // Must Root, CA
-    private boolean digitalSignature; // Must EE
-    private boolean keyEncipherment; // Must EE
+    private Integer pathLen; // root, ca
+    private boolean subjectKeyIdentifier; // root
+    private boolean authorityKeyIdentifier; // root
+    private boolean serverAuth;
+    private boolean clientAuth;
+
 }
 
 // Root, CA
