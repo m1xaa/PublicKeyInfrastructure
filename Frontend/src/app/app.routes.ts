@@ -13,6 +13,7 @@ import { ApproveUsersComponent } from './user/ca/approve-users/approve-users.com
 import {ListCertificateComponent} from './certificates/component/list-certificate/list-certificate.component';
 import {DetailsCertificateComponent} from './certificates/component/details-certificate/details-certificate.component';
 import { FormCsrComponent } from './certificate-signing-request/components/form-csr/form-csr.component';
+import { roleGuard } from './infrastructure/auth/guard/role.guard';
 
 export const routes: Routes = [
   {
@@ -28,7 +29,7 @@ export const routes: Routes = [
   {
     path: 'user/register/ca',
     component: RegisterCaComponent,
-    canActivate: [authGuard],
+    canActivate: [roleGuard],
     data: { roles: ['ADMIN'] },
   },
   {
@@ -49,13 +50,13 @@ export const routes: Routes = [
   {
     path: 'user/approve',
     component: ApproveUsersComponent,
-    canActivate: [authGuard],
+    canActivate: [roleGuard],
     data: { roles: ['CA'] },
   },
   {
     path: 'admin-panel',
     component: ListCertificateComponent,
-    canActivate: [authGuard],
+    canActivate: [roleGuard],
     data: { roles: ['ADMIN'] },
   },
   {
@@ -71,7 +72,8 @@ export const routes: Routes = [
   {
     path: 'certificate-signing-request',
     component: FormCsrComponent,
-    canActivate: [authGuard],
+    canActivate: [roleGuard],
+    data: { roles: ['REGULAR'] },
   },
   {
     path: '**',

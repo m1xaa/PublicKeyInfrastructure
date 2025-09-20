@@ -13,6 +13,7 @@ import java.util.UUID;
 @Builder
 public class CertificateResponseCard {
     private UUID id;
+    private UUID issuerId;
     private String commonName;
     private String email;
     private Date validFrom;

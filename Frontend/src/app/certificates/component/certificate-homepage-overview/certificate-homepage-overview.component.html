@@ -1,0 +1,38 @@
+<div class="p-6">
+  <h2 class="text-2xl font-bold mb-6">Certificates Overview</h2>
+
+  <!-- Render all roots -->
+  <div class="space-y-6">
+    <ng-container *ngFor="let root of getRoots()">
+      <ng-container *ngTemplateOutlet="renderNode; context: { $implicit: root }"></ng-container>
+    </ng-container>
+  </div>
+</div>
+
+<!-- Recursive template -->
+<ng-template #renderNode let-node>
+  <div class="relative">
+    <!-- Certificate Card -->
+    <div class="flex items-start">
+      <app-card-certificate [certificate]="node" class="z-10"></app-card-certificate>
+    </div>
+
+    <!-- Children -->
+    <div *ngIf="getChildren(node.id).length > 0" class="ml-12 mt-4 relative">
+      <!-- Vertical line from parent to children -->
+      <div class="absolute top-0 left-0 h-full w-px bg-gray-300"></div>
+
+      <div class="space-y-6">
+        <ng-container *ngFor="let child of getChildren(node.id)">
+          <div class="relative pl-6">
+            <!-- Horizontal connector line -->
+            <div class="absolute top-6 left-0 w-6 h-px bg-gray-300"></div>
+
+            <!-- Recursive call -->
+            <ng-container *ngTemplateOutlet="renderNode; context: { $implicit: child }"></ng-container>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</ng-template>

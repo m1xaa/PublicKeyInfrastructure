@@ -57,6 +57,11 @@ export class CertificateServiceService {
       .pipe(catchError(handleHttpError));
   }
 
+  getCertificateOverviewByUserId(userId: number): Observable<CertificateResponseDTO[]> {
+    return this.http.get<CertificateResponseDTO[]>(`${environment.apiHost}/api/certificates/overview/by-user/${userId}`)
+      .pipe(catchError(handleHttpError));
+  }
+
   downloadKeyStore(certificateId: string) {
     console.log(certificateId);
     // MUST BE 'http://localhost:8080/', DO NOT USE .env

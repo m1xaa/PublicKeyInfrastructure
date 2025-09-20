@@ -3,6 +3,7 @@ package com.ftnteam11_2025.pki.pki_system.certificates.controller;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.*;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateAuthorityService;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateOverviewService;
 import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateSigningService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class CertificateAuthorityController {
     private final ICertificateAuthorityService certificateAuthorityService;
     private final ICertificateSigningService certificateSigningService;
+    private final ICertificateOverviewService certificateOverviewService;
 
     // CA
     @Secured({"ROLE_ADMIN", "ROLE_CA"})
@@ -62,8 +64,7 @@ public class CertificateAuthorityController {
         return ResponseEntity.ok(certificateAuthorityService.getCertificates());
     }
 
-
-    @Secured({"ROLE_ADMIN", "ROLE_CA"})
+    
     @GetMapping("/{id}")
     public ResponseEntity<CertificateDetailsDTO> getCertificateDetails(@PathVariable("id") UUID id) throws Exception {
         return ResponseEntity.ok(certificateAuthorityService.getCertificateDetails(id));
@@ -92,5 +93,10 @@ public class CertificateAuthorityController {
     @GetMapping("/by-user/{userId}")
     public ResponseEntity<OrganizationCACertificatesResponseDTO> getCACertificatesByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(certificateSigningService.getOrganizationCACertificates(userId));
+    }
+
+    @GetMapping("/overview/by-user/{userId}")
+    public ResponseEntity<List<CertificateResponseCard>> getCertificateOverviewByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(certificateOverviewService.getCertificatesByUserId(userId));
     }
 }
