@@ -213,8 +213,8 @@
               >Certificate type</label
             >
             <select class="input col-span-2" formControlName="certificateType">
-              <option disabled>Select Certificate type</option>
-              <option>RootCA</option>
+              <option  value="" disabled selected>Select Certificate type</option>
+              <option *ngIf="!(isCA$|async)">RootCA</option>
               <option>CA</option>
               <option>EndEntity</option>
             </select>
@@ -242,7 +242,7 @@
               >Parent Certificate</label
             >
             <select class="input w-full" formControlName="certificateId">
-              <option [ngValue]="null" disabled>Select Certificate</option>
+              <option value="" disabled selected>Select Certificate</option>
               <option
                 *ngFor="let c of existingCerts"
                 [ngValue]="c.certificateId"

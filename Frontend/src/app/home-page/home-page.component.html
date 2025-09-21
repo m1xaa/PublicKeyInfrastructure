@@ -1,0 +1,20 @@
+<div>
+  <div style="display: flex; justify-content: flex-start;">
+    <button
+    *ngIf="isRegularUser()"
+      [routerLink]="['/certificate-signing-request']"
+      type="button"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow m-5"
+    >
+      Create Certificate
+    </button>
+    <button
+      [routerLink]="['/crl-overview']"
+      type="button"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow m-5"
+    >
+      Crl Overview
+    </button>
+  </div>
+  <app-certificate-homepage-overview/>
+</div>

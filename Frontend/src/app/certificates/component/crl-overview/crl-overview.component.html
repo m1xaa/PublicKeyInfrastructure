@@ -1,0 +1,30 @@
+<h2 class="text-2xl font-semibold text-center my-8 py-5">
+  Certificate Revocation List
+</h2>
+
+<div class="flex justify-center">
+  <table class="table-auto border-collapse border border-gray-300 shadow-md rounded-lg">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-6 py-3 border border-gray-300 text-left">Common Name</th>
+        <th class="px-6 py-3 border border-gray-300 text-left">Generated At</th>
+        <th class="px-6 py-3 border border-gray-300 text-left">Reason</th>
+        <th class="px-6 py-3 border border-gray-300 text-center">Donwload</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let rev of revocations" class="hover:bg-gray-50">
+        <td class="px-6 py-3 border border-gray-300">{{ rev.commonName }}</td>
+        <td class="px-6 py-3 border border-gray-300">{{ rev.generatedAt }}</td>
+        <td class="px-6 py-3 border border-gray-300">{{ rev.revocationReason }}</td>
+        <td class="px-6 py-3 border border-gray-300 text-center">
+          <button 
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            (click)="downloadCrl(rev.id)">
+            Download
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

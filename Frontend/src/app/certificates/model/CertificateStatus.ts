@@ -1,5 +1,5 @@
 export enum CertificateStatus {
-  Active,
-  Revoked,
-  Expired,
+  Active = "Active",
+  Revoked = "Revoked",
+  Expired = "Expired",
 }

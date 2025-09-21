@@ -7,7 +7,6 @@ import com.ftnteam11_2025.pki.pki_system.certificates.service.impl.PasswordUtils
 import com.ftnteam11_2025.pki.pki_system.organization.dto.*;
 import com.ftnteam11_2025.pki.pki_system.organization.mapper.HierarchyMapper;
 import com.ftnteam11_2025.pki.pki_system.organization.mapper.OrganizationMapper;
-import com.ftnteam11_2025.pki.pki_system.organization.mapper.OrganizationMapperImpl;
 import com.ftnteam11_2025.pki.pki_system.organization.model.Organization;
 import com.ftnteam11_2025.pki.pki_system.organization.repository.OrganizationRepository;
 import com.ftnteam11_2025.pki.pki_system.organization.service.interfaces.IOrganizationService;

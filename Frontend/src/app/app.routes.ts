@@ -12,6 +12,9 @@ import { ActivateAccountCaComponent } from './user/activate-account-ca/activate-
 import { ApproveUsersComponent } from './user/ca/approve-users/approve-users.component';
 import {ListCertificateComponent} from './certificates/component/list-certificate/list-certificate.component';
 import {DetailsCertificateComponent} from './certificates/component/details-certificate/details-certificate.component';
+import { FormCsrComponent } from './certificate-signing-request/components/form-csr/form-csr.component';
+import { roleGuard } from './infrastructure/auth/guard/role.guard';
+import { CrlOverviewComponent } from './certificates/component/crl-overview/crl-overview.component';
 
 export const routes: Routes = [
   {
@@ -66,6 +69,17 @@ export const routes: Routes = [
     path: 'certificates',
     component: FormCertificateComponent,
     canActivate: [authGuard],
+  },
+  {
+    path: 'certificate-signing-request',
+    component: FormCsrComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['REGULAR'] },
+  },
+  {
+    path: 'crl-overview',
+    component: CrlOverviewComponent,
+    canActivate: [authGuard]
   },
   {
     path: '**',

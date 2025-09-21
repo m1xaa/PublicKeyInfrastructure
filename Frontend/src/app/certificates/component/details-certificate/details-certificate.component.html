@@ -2,7 +2,7 @@
   <div class="w-full max-w-3xl bg-primary-100 rounded-2xl shadow-md p-6 border border-primary-300">
 
     <!-- SUBJECT -->
-    <div class="mb-6">
+    <div class="mb-6" *ngIf="certificate">
       <h3 class="text-xl font-semibold text-text-800 mb-4">Issued To</h3>
       <div class="grid grid-cols-2 gap-y-2">
         <span class="text-sm text-text-600">Common Name (CN)</span>
@@ -17,7 +17,7 @@
     </div>
 
     <!-- ISSUER -->
-    <div class="mb-6">
+    <div class="mb-6" *ngIf="certificate">
       <h3 class="text-xl font-semibold text-text-800 mb-4">Issued By</h3>
       <div class="grid grid-cols-2 gap-y-2">
         <span class="text-sm text-text-600">Common Name (CN)</span>
@@ -32,7 +32,7 @@
     </div>
 
     <!-- VALIDITY DATE -->
-    <div class="mb-6">
+    <div class="mb-6" *ngIf="certificate">
       <h3 class="text-xl font-semibold text-text-800 mb-4">Validity Period</h3>
       <div class="grid grid-cols-2 gap-y-2">
         <span class="text-sm text-text-600">Issued On</span>
@@ -44,7 +44,7 @@
     </div>
 
     <!-- SECURE -->
-    <div>
+    <div *ngIf="certificate">
       <h3 class="text-xl font-semibold text-text-800 mb-4">SHA-256 Fingerprints</h3>
       <div class="grid grid-cols-2 gap-y-2">
         <span class="text-sm text-text-600">Certificate</span>

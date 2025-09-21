@@ -114,63 +114,71 @@ export class FormCertificateComponent {
 
     this.getOrganizationHierarchy();
     this.getAllOrganizations();
-
-    if (this.isCA$) {
-      this.form.get('organization')?.setValue(this.organizationName);
-      this.form.get('organization')?.disable();
-    }
+    this.isCA$.subscribe(isCa => {
+      if (isCa) {
+        this.form.get('organization')?.setValue(this.organizationName);
+        this.form.get('organization')?.disable();
+      }
+    });
   }
 
 
   isInvalid(controlName: string): boolean {
     const control = this.form.get(controlName);
+    if (!!control && control.invalid && (control.touched || control.dirty)) {
+      console.log(controlName);
+    }
     return !!control && control.invalid && (control.touched || control.dirty);
   }
 
   getAllUsers(name: string = '') {
-    if(this.isCA$){
-      this.userService.getAllUsersByOrganization(name).subscribe({
+    this.isCA$.subscribe(isCa => {
+      if (isCa) {
+        this.userService.getAllUsersByOrganization(name).subscribe({
+          next: (users: UserResponse[]) => {
+            console.log("Korisnisci: " + users);
+            this.users = users;
+          },
+          error: (err) => {
+            this.toast.error(err.message, 'Error');
+          },
+        })
+      } else {
+        this.userService.getAllUsers().subscribe({
         next: (users: UserResponse[]) => {
-          this.users = users;
-        },
-        error: (err) => {
-          this.toast.error(err.message, 'Error');
-        },
-      })
-    }else{
-      this.userService.getAllUsers().subscribe({
-        next: (users: UserResponse[]) => {
-
+          console.log("Korisnisci: " + users);
           this.users = users;
         },
         error: (err) => {
           this.toast.error(err.message, 'Error');
         },
       });
-    }
+      }
+    });
   }
 
   getParentCertificates() {
-    if(this.isCA$){
-      this.certService.getCertificatesParentByOrganization(this.organizationName).subscribe({
-        next: (certs: CertificateResponse[]) => {
-          this.existingCerts = certs;
-        },
-        error: (err) => {
-          this.toast.error(err.message, 'Error');
-        },
-      })
-    }else{
-      this.certService.getCertificatesParent().subscribe({
-        next: (certs: CertificateResponse[]) => {
-          this.existingCerts = certs;
-        },
-        error: (err) => {
-          this.toast.error(err.message, 'Error');
-        },
-      });
-    }
-
+    this.isCA$.subscribe(isCa => {
+      if (isCa) {
+        this.certService.getCertificatesParentByOrganization(this.organizationName).subscribe({
+          next: (certs: CertificateResponse[]) => {
+            this.existingCerts = certs;
+          },
+          error: (err) => {
+            this.toast.error(err.message, 'Error');
+          },
+        })
+      } else {
+        this.certService.getCertificatesParent().subscribe({
+          next: (certs: CertificateResponse[]) => {
+            this.existingCerts = certs;
+          },
+          error: (err) => {
+            this.toast.error(err.message, 'Error');
+          },
+        });
+      }
+    });
   }
 
   getAllOrganizations() {
@@ -185,31 +193,33 @@ export class FormCertificateComponent {
   }
 
   getOrganizationHierarchy() {
-    if(this.isCA$){
-      this.organizationService.getHierarchyByOrganization().subscribe({
-        next: (res: OrganizationHierarchy) => {
-          this.hierarchyOrgs = [res];
-          this.organizationName = res.organizationName;
-          this.form.get('organization')?.setValue(this.organizationName);
-          this.getAllUsers(res.organizationName);
-          this.getParentCertificates();
-        },
-        error: (err) => {
-          this.toast.error(err.message, 'Error');
-        },
-      })
-    }else{
-      this.organizationService.getHierarchy().subscribe({
-        next: (res: OrganizationHierarchy[]) => {
-          this.hierarchyOrgs = res;
-          console.log(res);
-        },
-        error: (err) => {
-          this.toast.error(err.message, 'Error');
-        },
-      });
-    }
-
+    this.isCA$.subscribe(isCa => {
+      if (isCa) {
+        this.organizationService.getHierarchyByOrganization().subscribe({
+          next: (res: OrganizationHierarchy) => {
+            this.hierarchyOrgs = [res];
+            this.organizationName = res.organizationName;
+            this.form.get('organization')?.setValue(this.organizationName);
+            this.getAllUsers(res.organizationName);
+            this.getParentCertificates();
+          },
+          error: (err) => {
+            this.toast.error(err.message, 'Error');
+          },
+        })
+      } else {
+        this.getAllUsers();
+        this.organizationService.getHierarchy().subscribe({
+          next: (res: OrganizationHierarchy[]) => {
+            this.hierarchyOrgs = res;
+            console.log(res);
+          },
+          error: (err) => {
+            this.toast.error(err.message, 'Error');
+          },
+        });
+      }
+    });
   }
 
   get isCA$(): Observable<boolean> {
@@ -217,7 +227,7 @@ export class FormCertificateComponent {
   }
 
   submit() {
-
+    console.log("submit...")
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       console.log('Form is invalid');
