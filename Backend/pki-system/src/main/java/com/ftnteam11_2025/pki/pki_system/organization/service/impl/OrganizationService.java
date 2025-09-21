@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class OrganizationService implements IOrganizationService {
 
     private final OrganizationRepository organizationRepository;
@@ -34,6 +33,13 @@ public class OrganizationService implements IOrganizationService {
 
     @Value("${security.master-key}")
     private String masterKey;
+
+    public OrganizationService(OrganizationRepository organizationRepository, OrganizationMapper organizationMapper, CertificateAuthorityRepository certificateAuthorityRepository, CurrentUserService currentUserService) {
+        this.organizationRepository = organizationRepository;
+        this.organizationMapper = organizationMapper;
+        this.certificateAuthorityRepository = certificateAuthorityRepository;
+        this.currentUserService = currentUserService;
+    }
 
     @Override
     public Organization saveOrganization(Organization org) {

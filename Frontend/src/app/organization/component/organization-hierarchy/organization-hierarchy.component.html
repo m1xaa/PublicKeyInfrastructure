@@ -1,30 +1,33 @@
-<div class="max-w-5xl mx-auto space-y-12">
-
+<div class="max-w-5xl mx-auto space-y-12 py-6">
   <!-- Prolazak kroz sve organizacije -->
-  <div *ngFor="let org of hierarchy" class="p-6 bg-primary-100 rounded-2xl shadow-lg">
+  @for (org of hierarchy; track $index) { @if (org.rootCertificates.length > 0)
+  {
+  <div class="p-6 bg-primary-100 rounded-2xl shadow-lg">
     <h2 class="text-2xl font-bold text-text-700 mb-6">
       {{ org.organizationName }}
     </h2>
 
     <table class="w-full border-collapse">
       <thead class="bg-primary-300">
-      <tr>
-        <th class="text-left p-2">Common Name</th>
-        <th class="text-left p-2">Type</th>
-        <th class="text-left p-2">Status</th>
-        <th class="text-left p-2">Valid From</th>
-        <th class="text-left p-2">Valid To</th>
-      </tr>
+        <tr>
+          <th class="text-left p-2">Common Name</th>
+          <th class="text-left p-2">Type</th>
+          <th class="text-left p-2">Status</th>
+          <th class="text-left p-2">Valid From</th>
+          <th class="text-left p-2">Valid To</th>
+        </tr>
       </thead>
       <tbody>
-      <ng-container *ngFor="let root of org.rootCertificates">
-        <ng-container
-          *ngTemplateOutlet="nodeRow; context:{ node: root, level: 0 }">
+        <ng-container *ngFor="let root of org.rootCertificates">
+          <ng-container
+            *ngTemplateOutlet="nodeRow; context: { node: root, level: 0 }"
+          >
+          </ng-container>
         </ng-container>
-      </ng-container>
       </tbody>
     </table>
   </div>
+  } }
 </div>
 
 <!-- rekurzivni template ostaje isti -->
@@ -35,8 +38,10 @@
     </td>
     <td class="p-2">{{ node.type }}</td>
     <td class="p-2">
-      <span [class.text-green-600]="node.status === 'Active'"
-            [class.text-red-600]="node.status !== 'Active'">
+      <span
+        [class.text-green-600]="node.status === 'Active'"
+        [class.text-red-600]="node.status !== 'Active'"
+      >
         {{ node.status }}
       </span>
     </td>
@@ -46,7 +51,8 @@
 
   <ng-container *ngFor="let child of node.children">
     <ng-container
-      *ngTemplateOutlet="nodeRow; context:{ node: child, level: level + 1 }">
+      *ngTemplateOutlet="nodeRow; context: { node: child, level: level + 1 }"
+    >
     </ng-container>
   </ng-container>
 </ng-template>

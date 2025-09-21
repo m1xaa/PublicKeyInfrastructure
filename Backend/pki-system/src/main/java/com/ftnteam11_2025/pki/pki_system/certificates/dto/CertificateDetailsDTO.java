@@ -1,5 +1,6 @@
 package com.ftnteam11_2025.pki.pki_system.certificates.dto;
 
+import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,4 +19,5 @@ public class CertificateDetailsDTO {
     private Date validTo;
     private String certificateKey;
     private String publicKey;
+    private CertificateStatus status;
 }

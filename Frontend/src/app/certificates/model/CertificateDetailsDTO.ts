@@ -1,4 +1,5 @@
-import {SubjectIssuerDTO} from './SubjectIssuerDTO';
+import { CertificateStatus } from './CertificateStatus';
+import { SubjectIssuerDTO } from './SubjectIssuerDTO';
 
 export interface CertificateDetailsDTO {
   id: string;
@@ -11,4 +12,5 @@ export interface CertificateDetailsDTO {
 
   certificateKey: string;
   publicKey: string;
+  status: CertificateStatus;
 }

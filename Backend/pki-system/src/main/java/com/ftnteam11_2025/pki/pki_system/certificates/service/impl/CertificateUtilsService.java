@@ -154,6 +154,7 @@ public class CertificateUtilsService implements ICertificateUtilsService {
                     .validTo(x509Certificate.getNotAfter())
                     .certificateKey(CertificateUtils.getSHA256Fingerprint(x509Certificate))
                     .publicKey(publicKeyBase64)
+                    .status(cer.getStatus())
                     .build();
         }
 

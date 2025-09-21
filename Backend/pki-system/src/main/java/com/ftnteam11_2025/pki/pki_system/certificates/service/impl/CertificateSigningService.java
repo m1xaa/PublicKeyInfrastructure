@@ -2,6 +2,7 @@ package com.ftnteam11_2025.pki.pki_system.certificates.service.impl;
 
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateRequestDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateSigningRequestDTO;
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.ExtensionDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.dto.OrganizationCACertificatesResponseDTO;
 import com.ftnteam11_2025.pki.pki_system.certificates.mappers.certificate.OrganizationCACertificatesMapper;
 import com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority;
@@ -72,7 +73,7 @@ public class CertificateSigningService implements ICertificateSigningService {
                 request.validTo(),
                 request.caCertificateId(),
                 CertificateType.EndEntity,
-                List.of()
+                new ExtensionDTO()
         );
         certificateAuthorityService.createCertificateAuthority(createCertificateRequest);
 
@@ -122,7 +123,7 @@ public class CertificateSigningService implements ICertificateSigningService {
                     LocalDate.parse(validTo),
                     UUID.fromString(caCertificateId),
                     CertificateType.EndEntity,
-                    List.of()
+                    new ExtensionDTO()
             );
 
             certificateAuthorityService.createEndEntityFromCSR(createCertificateRequest, publicKey);

@@ -10,11 +10,12 @@ import { HomePageComponent } from './home-page/home-page.component';
 import { RegisterCaComponent } from './user/register-ca/register-ca.component';
 import { ActivateAccountCaComponent } from './user/activate-account-ca/activate-account-ca.component';
 import { ApproveUsersComponent } from './user/ca/approve-users/approve-users.component';
-import {ListCertificateComponent} from './certificates/component/list-certificate/list-certificate.component';
-import {DetailsCertificateComponent} from './certificates/component/details-certificate/details-certificate.component';
+import { ListCertificateComponent } from './certificates/component/list-certificate/list-certificate.component';
+import { DetailsCertificateComponent } from './certificates/component/details-certificate/details-certificate.component';
 import { FormCsrComponent } from './certificate-signing-request/components/form-csr/form-csr.component';
 import { roleGuard } from './infrastructure/auth/guard/role.guard';
 import { CrlOverviewComponent } from './certificates/component/crl-overview/crl-overview.component';
+import { OrganizationsPageComponent } from './organization/component/organizations-page/organizations-page.component';
 
 export const routes: Routes = [
   {
@@ -30,8 +31,8 @@ export const routes: Routes = [
   {
     path: 'user/register/ca',
     component: RegisterCaComponent,
-    canActivate: [authGuard],
-    data: { roles: ['ADMIN'] },
+    canActivate: [roleGuard],
+    data: { roles: ['ADMINISTRATOR'] },
   },
   {
     path: 'user/activate',
@@ -57,8 +58,8 @@ export const routes: Routes = [
   {
     path: 'admin-panel',
     component: ListCertificateComponent,
-    canActivate: [authGuard],
-    data: { roles: ['ADMIN'] },
+    canActivate: [roleGuard],
+    data: { roles: ['ADMINISTRATOR'] },
   },
   {
     path: 'certificate/:id',
@@ -77,9 +78,15 @@ export const routes: Routes = [
     data: { roles: ['REGULAR'] },
   },
   {
+    path: 'organizations',
+    component: OrganizationsPageComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['ADMINISTRATOR'] },
+  },
+  {
     path: 'crl-overview',
     component: CrlOverviewComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
   },
   {
     path: '**',

@@ -1,16 +1,13 @@
-import {Component, Input} from '@angular/core';
-import {NgForOf, NgTemplateOutlet} from '@angular/common';
-import {OrganizationHierarchy} from '../../model/organization-hierarchy';
+import { Component, Input } from '@angular/core';
+import { NgForOf, NgTemplateOutlet, NgIf } from '@angular/common';
+import { OrganizationHierarchy } from '../../model/organization-hierarchy';
 
 @Component({
   selector: 'app-organization-hierarchy',
   standalone: true,
-  imports: [
-    NgTemplateOutlet,
-    NgForOf
-  ],
+  imports: [NgTemplateOutlet, NgForOf],
   templateUrl: './organization-hierarchy.component.html',
-  styleUrl: './organization-hierarchy.component.css'
+  styleUrl: './organization-hierarchy.component.css',
 })
 export class OrganizationHierarchyComponent {
   @Input() hierarchy!: OrganizationHierarchy[];

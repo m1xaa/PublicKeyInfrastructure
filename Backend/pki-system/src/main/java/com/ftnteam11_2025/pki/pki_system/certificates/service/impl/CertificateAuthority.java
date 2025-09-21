@@ -291,7 +291,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         certificateUtilsService.validateRequest(issuerCA, validFrom, validTo);
 
         // Generate cert signed by CA
-        X509Certificate endEntityCert = certificateGenerator.generateEndEntity(subject, issuer, validFrom, validTo);
+        X509Certificate endEntityCert = certificateGenerator.generateEndEntity(subject, issuer, validFrom, validTo, requestDTO.getExtensions());
 
         String alias = "cert_" + endEntityCert.getSerialNumber();
         String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
