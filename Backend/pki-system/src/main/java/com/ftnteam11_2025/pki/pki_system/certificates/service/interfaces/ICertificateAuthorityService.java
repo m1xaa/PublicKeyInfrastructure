@@ -12,6 +12,7 @@ import org.springframework.core.io.UrlResource;
 
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.UUID;
@@ -25,4 +26,5 @@ public interface ICertificateAuthorityService {
     Resource downloadCertificateAuthority(UUID id) throws Exception;
     List<CertificateResponseCard> getCertificates();
     CertificateDetailsDTO getCertificateDetails(UUID id) throws Exception;
+    CertificateAuthority createEndEntityFromCSR(CertificateRequestDTO requestDTO, PublicKey publicKey) throws Exception;
 }

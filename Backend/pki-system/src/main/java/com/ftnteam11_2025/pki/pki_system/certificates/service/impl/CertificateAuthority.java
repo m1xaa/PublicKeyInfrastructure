@@ -262,6 +262,71 @@ public class CertificateAuthority implements ICertificateAuthorityService {
         return caRepository.save(certificateAuthority);
     }
 
+    @Transactional
+    public com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority createEndEntityFromCSR(CertificateRequestDTO requestDTO, PublicKey publicKey) throws Exception {
+        User user = certificateUtilsService.validateUser(requestDTO.getUserId(), requestDTO.getCertificateType(), CertificateType.EndEntity);
+
+        // Subject with CSR public key
+        X500Name endEntityX500Name = DistinguishedNameMapper.buildX500Name(
+                requestDTO.getCommonName(),
+                requestDTO.getSurname(),
+                requestDTO.getGivenName(),
+                requestDTO.getOrganization(),
+                requestDTO.getOrganizationalUnit(),
+                requestDTO.getCountry(),
+                requestDTO.getEmail()
+        );
+
+        Subject subject = Subject.builder()
+                .publicKey(publicKey)
+                .x500Name(endEntityX500Name)
+                .build();
+
+        com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority issuerCA = certificateAuthorityRepository.findById(requestDTO.getCertificateId())
+                .orElseThrow(() -> new NotFoundError("Issuer not found"));
+
+        Issuer issuer = certificateUtilsService.getIssuer(issuerCA, requestDTO.getOrganization());
+
+        // Dates
+        Date validFrom = Date.from(requestDTO.getValidFrom().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date validTo = Date.from(requestDTO.getValidTo().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        certificateUtilsService.validateRequest(issuerCA, validFrom, validTo);
+
+        // Generate cert signed by CA
+        X509Certificate endEntityCert = certificateGenerator.generateEndEntity(subject, issuer, validFrom, validTo);
+
+        String alias = "cert_" + endEntityCert.getSerialNumber();
+        String ksFilePath = "src/main/resources/static/keystores/" + System.currentTimeMillis() + ".jks";
+
+        Organization organization = certificateUtilsService.saveTransfer(
+                requestDTO.getOrganization(),
+                null,
+                endEntityCert,
+                CertificateType.EndEntity,
+                alias,
+                ksFilePath
+        );
+
+        com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certAuth =  com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority.builder()
+                .common_name(requestDTO.getCommonName())
+                .serialNumber(String.valueOf(endEntityCert.getSerialNumber()))
+                .distinguishedName(DistinguishedNameMapper.toDistinguishedNameString(subject.getX500Name()))
+                .validFrom(validFrom)
+                .validTo(validTo)
+                .status(CertificateStatus.Active)
+                .type(CertificateType.EndEntity)
+                .issuer(issuerCA)
+                .owner(user)
+                .alias(alias)
+                .ksFilePath(ksFilePath)
+                .organization(organization)
+                .build();
+
+        return certificateAuthorityRepository.save(certAuth);
+    }
+
+
     @Override
     public List<CertificateResponseDTO> getParentCertificate(){
         return certificateAuthorityRepository.findAllByStatusAndTypeNot(CertificateStatus.Active, CertificateType.EndEntity).stream().map(certificateMapper::toCertificateResponseDTO).collect(Collectors.toList());
