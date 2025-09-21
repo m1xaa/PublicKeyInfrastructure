@@ -59,28 +59,26 @@ public class KeyStoreReader {
         try {
             KeyStore ks = KeyStore.getInstance("JKS", "SUN");
 
-            BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile));
-            ks.load(in, keyStorePass.toCharArray());
-
-            if(ks.isKeyEntry(alias)) {
-                Certificate cert = ks.getCertificate(alias);
-                return cert;
+            try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile))) {
+                ks.load(in, keyStorePass.toCharArray());
             }
-        } catch (KeyStoreException e) {
+            
+            if (ks.isKeyEntry(alias)) {
+                return ks.getCertificate(alias);
+            }
+
+            if (ks.isCertificateEntry(alias)) {
+                return ks.getCertificate(alias);
+            }
+
+            throw new RuntimeException("Alias not found in keystore: " + alias);
+
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error reading certificate", e);
         }
-        return null;
     }
+
 
     public PrivateKey readPrivateKey(String keyStoreFile, String keyStorePass, String alias, String pass) {
         try {

@@ -54,6 +54,9 @@ export class CertificateHomepageOverviewComponent implements OnInit {
       next: () => {
         this.toastr.success("Certificate revoked successfully");
         this.loadCertificates();
+      },
+      error: () => {
+        this.toastr.error("PKI doesn't store your private key");
       }
     });
   }

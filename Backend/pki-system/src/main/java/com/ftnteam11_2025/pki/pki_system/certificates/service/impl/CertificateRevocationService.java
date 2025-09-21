@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.PrivateKey;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -77,6 +78,10 @@ public class CertificateRevocationService implements ICertificateRevocationServi
         CertificateAuthority ca = certificateAuthorityRepository.findById(certificateId)
                 .orElseThrow(() -> new NotFoundError("Certificate not found"));
 
+        if (ca.getStatus().equals(CertificateStatus.Revoked)) {
+            throw new BadRequestError("Certificate already revoked");
+        }
+
         CertificateRevocationList crl = certificateRevocationListRepository.findByCertificateAuthority(ca)
                 .orElse(CertificateRevocationList.builder()
                         .certificateAuthority(ca)
@@ -102,16 +107,21 @@ public class CertificateRevocationService implements ICertificateRevocationServi
         Date nextUpdate = Date.from(Instant.now().plus(30, ChronoUnit.DAYS));
         crlBuilder.setNextUpdate(nextUpdate);
 
-        for (CertificateAuthority cr : toRevoke) {
+        for (CertificateAuthority cer : toRevoke) {
             crlBuilder.addCRLEntry(
-                    new BigInteger(cr.getSerialNumber()),
+                    new BigInteger(cer.getSerialNumber()),
                     new Date(),
                     reason.ordinal()
             );
         }
+
+        PrivateKey issuerPrivateKey =  certificateUtilsService.getIssuer(ca, ca.getOrganization().getName()).getPrivateKey();
+        if (issuerPrivateKey == null) {
+            throw new BadRequestError("Issuer's private key not found");
+        }
         JcaContentSignerBuilder contentSignerBuilder = new JcaContentSignerBuilder("SHA256withRSA");
         ContentSigner signer = contentSignerBuilder.build(
-                certificateUtilsService.getIssuer(ca, ca.getOrganization().getName()).getPrivateKey()
+                issuerPrivateKey
         );
 
         X509CRLHolder crlHolder = crlBuilder.build(signer);
@@ -127,6 +137,9 @@ public class CertificateRevocationService implements ICertificateRevocationServi
 
     private void findAllToRevoke(List<CertificateAuthority> root, List<CertificateAuthority> toRevoke) {
         for (CertificateAuthority rootCert: root) {
+            if (rootCert.getStatus().equals(CertificateStatus.Revoked)) {
+                continue;
+            }
             rootCert.setStatus(CertificateStatus.Revoked);
             List<CertificateAuthority> children = certificateAuthorityRepository.findAllByIssuer(rootCert);
             toRevoke.addAll(children);

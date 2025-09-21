@@ -21,12 +21,15 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.StringReader;
+import java.security.PublicKey;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -101,6 +104,9 @@ public class CertificateSigningService implements ICertificateSigningService {
             String country = getRdnValue(subject, BCStyle.C);
             String email = getRdnValue(subject, BCStyle.E);
 
+            SubjectPublicKeyInfo subjectPublicKeyInfo = csr.getSubjectPublicKeyInfo();
+            PublicKey publicKey = new JcaPEMKeyConverter().getPublicKey(subjectPublicKeyInfo);
+
             User owner = userService.findById(userId);
 
             CertificateRequestDTO createCertificateRequest = new CertificateRequestDTO(
@@ -119,7 +125,7 @@ public class CertificateSigningService implements ICertificateSigningService {
                     List.of()
             );
 
-            certificateAuthorityService.createCertificateAuthority(createCertificateRequest);
+            certificateAuthorityService.createEndEntityFromCSR(createCertificateRequest, publicKey);
 
         } catch (Exception e) {
             throw new BadRequestError("Failed to process CSR: " + e.getMessage());
