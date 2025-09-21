@@ -43,7 +43,10 @@ export class FormCertificateComponent {
   hierarchyOrgs: OrganizationHierarchy[] = [];
   organizationName?:String = ""
   form!: FormGroup;
+  extensionForm!: FormGroup;
   today!: string;
+
+
 
   newOrganization = new FormControl('');
 
@@ -59,6 +62,13 @@ export class FormCertificateComponent {
   ngOnInit() {
     const now = new Date();
     this.today = now.toISOString().split('T')[0];
+    this.extensionForm = this.fb.group({
+      pathLen: [null],
+      subjectKeyIdentifier: [false],
+      authorityKeyIdentifier: [false],
+      serverAuth: [false],
+      clientAuth: [false]
+    })
     this.form = this.fb.group(
       {
         commonName: ['', Validators.required],
@@ -73,16 +83,23 @@ export class FormCertificateComponent {
         validTo: ['', Validators.required],
         certificateType: ['', Validators.required],
         certificateId: [''],
+
+        extensions: this.extensionForm,
       },
-      {
-        validators: futureDateRangeValidator(),
-      }
+      { validators: futureDateRangeValidator() }
     );
-    this.form.get('certificateType')!.valueChanges.subscribe((type) => {
-      if (type === 'Root') {
-        this.form.get('parentCert')!.reset();
+
+    // Reset extension polja pri promeni tipa sertifikata
+    const extensionsGroup = this.form.get('extensions') as FormGroup;
+    this.form.get('certificateType')!.valueChanges.subscribe(type => {
+      if(type === 'RootCA' || type === 'CA') {
+        extensionsGroup.patchValue({ serverAuth: false, clientAuth: false });
+      } else if(type === 'EndEntity') {
+        extensionsGroup.patchValue({ pathLen: null, subjectKeyIdentifier: false, authorityKeyIdentifier: false });
       }
     });
+
+    // Validacija parent certificate za CA i EndEntity
     this.form.get('certificateType')!.valueChanges.subscribe((type) => {
       const certIdControl = this.form.get('certificateId')!;
       if (type === 'CA' || type === 'EndEntity') {
@@ -94,6 +111,7 @@ export class FormCertificateComponent {
       }
       certIdControl.updateValueAndValidity();
     });
+
     this.getOrganizationHierarchy();
     this.getAllOrganizations();
     this.isCA$.subscribe(isCa => {
@@ -103,6 +121,7 @@ export class FormCertificateComponent {
       }
     });
   }
+
 
   isInvalid(controlName: string): boolean {
     const control = this.form.get(controlName);
@@ -216,6 +235,7 @@ export class FormCertificateComponent {
     }
     const dto: CertificateRequestDTO = this.form.getRawValue();
     console.log(dto);
+
     this.certService.generateCertificate(dto).subscribe({
       next: (cert: CertificateResponse) => {
         console.log(cert);
