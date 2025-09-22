@@ -19,18 +19,5 @@ public interface CertificateAuthorityRepository extends JpaRepository<Certificat
     List<CertificateAuthority> findAllByStatusAndTypeNotAndOrganization(CertificateStatus status, CertificateType type, Organization organization);
     List<CertificateAuthority> findAllByOwner(User owner);
     List<CertificateAuthority> findAllByIssuer(CertificateAuthority issuer);
-    @Query("""
-    SELECT new com.ftnteam11_2025.pki.pki_system.certificates.dto.CertificateResponseCard(
-    c.id,
-    c.issuer.id,
-    c.common_name,
-    c.owner.account.email,
-    c.validFrom,
-    c.validTo,
-    c.status
-    )
-    FROM CertificateAuthority c
-    WHERE c.issuer.id = :issuerId
-""")
-    List<CertificateResponseCard> findAllByIssuerId(@Param("issuerId") UUID issuerId);
+    List<CertificateAuthority> findAllByIssuerIsNull();
 }

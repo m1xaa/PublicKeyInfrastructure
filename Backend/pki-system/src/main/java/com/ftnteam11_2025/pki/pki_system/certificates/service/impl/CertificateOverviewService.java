@@ -9,9 +9,7 @@ import com.ftnteam11_2025.pki.pki_system.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,12 +37,12 @@ public class CertificateOverviewService implements ICertificateOverviewService {
     }
 
     private List<CertificateResponseCard> getCertificatesForCA(User owner) {
-        List<CertificateResponseCard> cards = certificateAuthorityRepository.findAllByOwner(owner).stream()
-                .map(this::convertToCard).toList();
-        this.removeIssuerForRootOwnersCerts(cards);
-        List<CertificateResponseCard> allCerts = new ArrayList<>(cards);
-        getCertificatesRecursively(cards, allCerts);
-        return allCerts;
+        List<CertificateAuthority> roots = certificateAuthorityRepository.findAllByIssuerIsNull();
+        List<CertificateResponseCard> result = new ArrayList<>();
+        Set<UUID> visited = new HashSet<>();
+
+        getCertificatesRecursively(roots, result, owner.getId(), false, visited);
+        return result;
     }
 
     private List<CertificateResponseCard> getCertificatesForAdmin() {
@@ -53,11 +51,29 @@ public class CertificateOverviewService implements ICertificateOverviewService {
                 .toList();
     }
 
-    private void getCertificatesRecursively(List<CertificateResponseCard> ownersCertificates, List<CertificateResponseCard> allCertificates) {
-        for (CertificateResponseCard cer: ownersCertificates) {
-            List<CertificateResponseCard> newCerts = certificateAuthorityRepository.findAllByIssuerId(cer.getId());
-            allCertificates.addAll(newCerts);
-            getCertificatesRecursively(newCerts, allCertificates);
+    private void getCertificatesRecursively(
+            List<CertificateAuthority> current,
+            List<CertificateResponseCard> result,
+            Long ownerId,
+            boolean shouldAdd,
+            Set<UUID> visited
+    ) {
+        for (CertificateAuthority cer : current) {
+            if (!visited.add(cer.getId())) continue;
+
+            boolean sameOwner = cer.getOwner().getId().equals(ownerId);
+            boolean nextShouldAdd = shouldAdd || sameOwner;
+
+            if (sameOwner || shouldAdd) {
+                CertificateResponseCard dto = convertToCard(cer);
+                if (sameOwner && !shouldAdd) {
+                    dto.setIssuerId(null); // only top owned cert loses issuer for front tree like overview
+                }
+                result.add(dto);
+            }
+
+            List<CertificateAuthority> children = certificateAuthorityRepository.findAllByIssuer(cer);
+            getCertificatesRecursively(children, result, ownerId, nextShouldAdd, visited);
         }
     }
 
