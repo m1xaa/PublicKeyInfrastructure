@@ -1,0 +1,218 @@
+<nav
+  class="fixed top-0 left-0 w-full z-50 bg-primary-700 border-b border-secondary-700"
+>
+  <div
+    class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
+  >
+    @if((isAdmin$|async)){
+    <a
+      class="flex items-center space-x-3 rtl:space-x-reverse"
+      routerLink="/admin-panel"
+      [routerLinkActiveOptions]="{ exact: true }"
+      routerLinkActive="text-secondary-400"
+    >
+      <span
+        class="self-center text-2xl font-semibold whitespace-nowrap text-white"
+        >PKI system</span
+      >
+    </a>
+    } @else {
+    <a
+      class="flex items-center space-x-3 rtl:space-x-reverse"
+      routerLink=""
+      [routerLinkActiveOptions]="{ exact: true }"
+      routerLinkActive="text-secondary-400"
+    >
+      <span
+        class="self-center text-2xl font-semibold whitespace-nowrap text-white"
+        >PKI system</span
+      >
+    </a>
+    }
+
+    <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+      @if ((loggedIn$|async)) {
+      <button
+        type="button"
+        (click)="logOut()"
+        class="cursor-pointer text-white bg-secondary-600 hover:bg-secondary-400 focus:ring-4 focus:outline-none focus:ring-secondary-400 font-medium rounded-lg text-sm px-4 py-2 text-center"
+      >
+        Log out
+      </button>
+      }@else {
+      <button
+        type="button"
+        routerLink="/user/login"
+        routerLinkActive="text-secondary-400"
+        class="cursor-pointer text-white bg-secondary-600 hover:bg-secondary-400 focus:ring-4 focus:outline-none focus:ring-secondary-400 font-medium rounded-lg text-sm px-4 py-2 text-center"
+      >
+        Log in
+      </button>
+      }
+      <button
+        data-collapse-toggle="navbar-cta"
+        type="button"
+        class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm rounded-lg md:hidden text-gray-400 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-600"
+        aria-controls="navbar-cta"
+        aria-expanded="false"
+      >
+        <span class="sr-only">Open main menu</span>
+        <svg
+          class="w-5 h-5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 17 14"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 1h15M1 7h15M1 13h15"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div
+      class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+      id="navbar-cta"
+    >
+      @if ((isAdmin$|async)) {
+      <ul
+        class="flex flex-col font-medium p-2 md:p-0 mt- rounded-lg bg-primary-700 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:bg-primary-700"
+      >
+        <li>
+          <a
+            routerLink=""
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Home page</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/admin-panel"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Admin home</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/certificates"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Certificates</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/user/register/ca"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Register CA</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/crl-overview"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Crl Overview</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/organizations"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+          >
+            Organizations</a
+          >
+        </li>
+      </ul>
+      } @else if ((isRegularUser$|async)) {
+      <ul
+        class="flex flex-col font-medium p-2 md:p-0 mt- rounded-lg bg-primary-700 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:bg-primary-700"
+      >
+        <li>
+          <a
+            routerLink=""
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Home page</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/crl-overview"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Crl Overview</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/certificate-signing-request"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Create Certificate</a
+          >
+        </li>
+      </ul>
+      }@else if ((isCA$|async)) {
+      <ul
+        class="flex flex-col font-medium p-2 md:p-0 mt- rounded-lg bg-primary-700 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:bg-primary-700"
+      >
+        <li>
+          <a
+            routerLink=""
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Home page</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/user/approve"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Applications</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/certificates"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Certificates</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/crl-overview"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
+            class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
+            >Crl Overview</a
+          >
+        </li>
+      </ul>
+      }
+    </div>
+  </div>
+</nav>

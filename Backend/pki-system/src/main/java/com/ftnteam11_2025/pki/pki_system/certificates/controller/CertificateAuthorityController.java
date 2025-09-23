@@ -1,0 +1,120 @@
+package com.ftnteam11_2025.pki.pki_system.certificates.controller;
+
+import com.ftnteam11_2025.pki.pki_system.certificates.dto.*;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateAuthorityService;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateOverviewService;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateRevocationService;
+import com.ftnteam11_2025.pki.pki_system.certificates.service.interfaces.ICertificateSigningService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("api/certificates")
+@RequiredArgsConstructor
+public class CertificateAuthorityController {
+    private final ICertificateAuthorityService certificateAuthorityService;
+    private final ICertificateSigningService certificateSigningService;
+    private final ICertificateOverviewService certificateOverviewService;
+    private final ICertificateRevocationService certificateRevocationService;
+
+    // CA
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
+    @PostMapping
+    public ResponseEntity<CertificateResponseDTO> create(@RequestBody CertificateRequestDTO req) throws Exception {
+        return ResponseEntity.ok(certificateAuthorityService.createCertificateAuthority(req));
+    }
+
+    // CA
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
+    @GetMapping("/parent")
+    public ResponseEntity<List<CertificateResponseDTO>> getAllParent() {
+        return ResponseEntity.ok(certificateAuthorityService.getParentCertificate());
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_CA"})
+    @GetMapping("/parent/{name}")
+    public ResponseEntity<List<CertificateResponseDTO>> getAllParent(@PathVariable String name) {
+        return ResponseEntity.ok(certificateAuthorityService.getParentCertificateByOrganization(name));
+    }
+
+    // mogu svi download?
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> download(@PathVariable("id") UUID id) throws Exception {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"keystore.jks\"")
+                .body(certificateAuthorityService.downloadCertificateAuthority(id));
+    }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping
+    public ResponseEntity<List<CertificateResponseCard>> getAll() {
+        return ResponseEntity.ok(certificateAuthorityService.getCertificates());
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CertificateDetailsDTO> getCertificateDetails(@PathVariable("id") UUID id) throws Exception {
+        return ResponseEntity.ok(certificateAuthorityService.getCertificateDetails(id));
+    }
+
+    @PostMapping("/csr-autogenerate/for-user/{userId}")
+    public ResponseEntity<Void> createCSRAutogenerate(
+            @RequestBody CertificateSigningRequestDTO request,
+            @PathVariable Long userId
+    ) throws Exception {
+        certificateSigningService.createCSRAutogenerate(userId, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/csr-selfgenerate/for-user/{userId}")
+    public ResponseEntity<Void> createCSRSelfgenerate(
+            @PathVariable Long userId,
+            @RequestParam String caCertificateId,
+            @RequestParam String validTo,
+            @RequestParam MultipartFile pemFile
+    )  {
+        certificateSigningService.createCSRSelfgenerate(userId, caCertificateId, validTo, pemFile);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<OrganizationCACertificatesResponseDTO> getCACertificatesByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(certificateSigningService.getOrganizationCACertificates(userId));
+    }
+
+    @GetMapping("/overview/by-user/{userId}")
+    public ResponseEntity<List<CertificateResponseCard>> getCertificateOverviewByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(certificateOverviewService.getCertificatesByUserId(userId));
+    }
+
+    @PostMapping("/{id}/revoke")
+    public ResponseEntity<Void> revoke(@PathVariable("id") UUID id, @RequestBody RevokeCertificateDTO request) throws Exception {
+        certificateRevocationService.revokeCertificate(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/revocations")
+    public ResponseEntity<List<CertificateRevocationResponseDTO>> getAllRevocations(){
+        return ResponseEntity.ok(certificateRevocationService.getAll());
+    }
+
+    @GetMapping("/revocations/{id}/download")
+    public ResponseEntity<Resource> downloadRevocation(@PathVariable("id") UUID id) throws Exception {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"revocation.crl\"")
+                .body(certificateRevocationService.download(id));
+    }
+}

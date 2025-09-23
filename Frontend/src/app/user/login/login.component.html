@@ -1,0 +1,152 @@
+<section class="bg-white">
+  <div
+    class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0"
+  >
+    <div class="w-full rounded-lg shadow border sm:max-w-md xl:p-0 bg-primary">
+      <div class="p-6 space-y-4 md:space-y-6 sm:p-8 bg-primary-100">
+        <h1
+          class="text-xl font-bold leading-tight tracking-tight md:text-2xl text-primary-500 text-center"
+        >
+          Sign in to your account
+        </h1>
+
+        <form
+          [formGroup]="form"
+          (ngSubmit)="onSubmit()"
+          class="space-y-6"
+          novalidate
+        >
+          <!-- EMAIL -->
+          <div>
+            <label
+              for="email"
+              class="block mb-2 text-sm font-medium text-primary-400"
+            >
+              Your email
+            </label>
+            <div class="relative">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                formControlName="email"
+                required
+                class="input w-full border p-2"
+                placeholder="example@company.com"
+              />
+            </div>
+            <p
+              *ngIf="email?.invalid && (email?.dirty || email?.touched)"
+              class="mt-1 text-xs text-red-500"
+            >
+              <span *ngIf="email?.errors?.['required']">
+                Email is required.
+              </span>
+              <span *ngIf="email?.errors?.['email']">
+                Please enter a valid email.
+              </span>
+            </p>
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="mb-1">
+            <label
+              for="password"
+              class="block mb-2 text-sm font-medium text-primary-400"
+            >
+              Your password
+            </label>
+            <div class="relative">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                name="password"
+                formControlName="password"
+                minlength="8"
+                required
+                autocomplete="new-password"
+                class="input w-full border p-2"
+                placeholder="password"
+              />
+
+              <button
+                type="button"
+                (click)="togglePasswordVisibility()"
+                class="absolute right-2 inset-y-0 flex items-center text-primary-400 hover:text-primary-600 transition-colors duration-200 cursor-pointer"
+              >
+                <svg
+                  *ngIf="!showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+                <svg
+                  *ngIf="showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a10.058 10.058 0 012.93-4.177M6.707 6.707a9.958 9.958 0 015.293-1.707c4.477 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.544 3.054M3 3l18 18"
+                  />
+                </svg>
+              </button>
+            </div>
+            <p
+              *ngIf="
+                password?.invalid && (password?.dirty || password?.touched)
+              "
+              class="mt-1 text-xs text-red-500"
+            >
+              <span *ngIf="password?.errors?.['required']">
+                Password is required.
+              </span>
+              <span *ngIf="password?.errors?.['invalidPassword']">
+                Password must be at least 8 characters long and contain at least
+                one letter and one number.
+              </span>
+            </p>
+          </div>
+
+          <!-- SUBMIT -->
+          <button
+            type="submit"
+            [disabled]="form.invalid || waitingResponse"
+            class="w-full disabled:bg-primary-400 text-white bg-secondary-500 hover:bg-secondary-400 focus:ring-4 focus:outline-none focus:ring-secondary-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            Login
+          </button>
+
+          <p class="text-sm font-light text-primary-600">
+            Don’t have an account yet?
+            <a
+              href="/user/register"
+              class="font-medium text-primary-500 hover:underline"
+              >Sign up</a
+            >
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

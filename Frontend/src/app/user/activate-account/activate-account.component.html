@@ -1,0 +1,78 @@
+<div class="flex justify-center items-center min-h-screen bg-secondary-800">
+  <div class="bg-primary-100 rounded-lg shadow-lg p-6 w-full max-w-md">
+    <div class="mb-4">
+      <h2 class="text-2xl font-semibold text-gray-800 text-center">
+        Email Verification
+      </h2>
+    </div>
+
+    <div class="space-y-6">
+      <!-- Loading State -->
+      <div
+        *ngIf="verificationStatus === 'loading'"
+        class="flex flex-col items-center"
+      >
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"
+        ></div>
+        <p class="text-gray-700">Verifying your account...</p>
+      </div>
+
+      <!-- Success State -->
+      <div *ngIf="verificationStatus === 'success'" class="text-center">
+        <div class="text-green-500 mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-12 h-12 mx-auto"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.208Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">
+          Account Activated
+        </h3>
+        <p class="text-gray-600 mb-4">
+          Your email has been successfully verified.
+        </p>
+        <a
+          routerLink="/user/login"
+          class="font-medium text-secondary-400 hover:underline"
+          >Go to Login</a
+        >
+      </div>
+
+      <!--Error State-->
+      <div *ngIf="verificationStatus === 'error'" class="text-center">
+        <div class="text-red-500 mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-12 h-12 mx-auto"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">
+          Verification Failed
+        </h3>
+        <a
+          routerLink="/user/register"
+          class="font-medium text-secondary-400 hover:underline"
+          >Sign up</a
+        >
+        <p class="text-gray-600">{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+</div>

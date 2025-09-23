@@ -1,11 +1,55 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{html,ts}",
-    "./node_modules/flowbite/**/*.js"  
-  ],
-  theme: { extend: {} },
-  plugins: [
-    require('flowbite/plugin')          
-  ],
+  content: ["./src/**/*.{html,ts}", "./node_modules/flowbite/**/*.js"],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          100: "oklch(0.95 0.00001 89.88)",
+          200: "oklch(0.85 0.00001 89.88)",
+          300: "oklch(0.7 0.00001 89.88)",
+          400: "oklch(0.55 0.00001 89.88)",
+          500: "oklch(0.423 0.00001 89.88)",
+          600: "oklch(0.35 0.00001 89.88)",
+          700: "oklch(0.28 0.00001 89.88)",
+          800: "oklch(0.2 0.00001 89.88)",
+          900: "oklch(0.14 0.00001 89.88)",
+        },
+        secondary: {
+          100: "oklch(0.88 0.09 250)",
+          200: "oklch(0.75 0.09 250)",
+          300: "oklch(0.65 0.08 250)",
+          400: "oklch(0.55 0.08 250)",
+          500: "oklch(0.45 0.07 250)",
+          600: "oklch(0.38 0.07 250)",
+          700: "oklch(0.30 0.06 250)",
+          800: "oklch(0.22 0.06 250)",
+          900: "oklch(0.15 0.05 250)",
+        },
+        tertiary: {
+          100: "oklch(0.9 0.01 90)",
+          200: "oklch(0.8 0.01 90)",
+          300: "oklch(0.7 0.01 90)",
+          400: "oklch(0.6 0.01 90)",
+          500: "oklch(0.5 0.01 90)",
+          600: "oklch(0.4 0.01 90)",
+          700: "oklch(0.3 0.01 90)",
+          800: "oklch(0.2 0.01 90)",
+          900: "oklch(0.12 0.01 90)",
+        },
+        text: {
+          100: "oklch(0.98 0 0)",
+          200: "oklch(0.95 0 0)",
+          300: "oklch(0.9 0 0)",
+          400: "oklch(0.85 0 0)",
+          500: "oklch(0.75 0 0)",
+          600: "oklch(0.6 0 0)",
+          700: "oklch(0.45 0 0)",
+          800: "oklch(0.3 0 0)",
+          900: "oklch(0.15 0 0)",
+        },
+      },
+    },
+  },
+  plugins: [require("flowbite/plugin")],
 };

@@ -1,0 +1,91 @@
+<div class="flex justify-center p-6">
+  <div
+    class="w-full max-w-3xl bg-primary-100 rounded-2xl shadow-md p-6 border border-primary-300"
+  >
+    <!-- SUBJECT -->
+    <div class="mb-6" *ngIf="certificate">
+      <h3 class="text-xl font-semibold text-text-800 mb-4">Issued To</h3>
+      <div class="grid grid-cols-2 gap-y-2">
+        <span class="text-sm text-text-600">Common Name (CN)</span>
+        <div class="text-text-800 font-medium">
+          {{ certificate.subject.commonName }}
+        </div>
+
+        <span class="text-sm text-text-600">Organization (O)</span>
+        <div class="text-text-800 font-medium">
+          {{ certificate.subject.organization }}
+        </div>
+
+        <span class="text-sm text-text-600">Organization Unit (OU)</span>
+        <div class="text-text-800 font-medium">
+          {{ certificate.subject.organizationUnit }}
+        </div>
+      </div>
+    </div>
+
+    <!-- ISSUER -->
+    <div class="mb-6" *ngIf="certificate">
+      <h3 class="text-xl font-semibold text-text-800 mb-4">Issued By</h3>
+      <div class="grid grid-cols-2 gap-y-2">
+        <span class="text-sm text-text-600">Common Name (CN)</span>
+        <div class="text-text-800 font-medium">
+          {{ certificate.issuer.commonName }}
+        </div>
+
+        <span class="text-sm text-text-600">Organization (O)</span>
+        <div class="text-text-800 font-medium">
+          {{ certificate.issuer.organization }}
+        </div>
+
+        <span class="text-sm text-text-600">Organization Unit (OU)</span>
+        <div class="text-text-800 font-medium">
+          {{ certificate.issuer.organizationUnit }}
+        </div>
+      </div>
+    </div>
+
+    <!-- VALIDITY DATE -->
+    <div class="mb-6" *ngIf="certificate">
+      <h3 class="text-xl font-semibold text-text-800 mb-4">Validity Period</h3>
+      <div class="grid grid-cols-2 gap-y-2">
+        <span class="text-sm text-text-600">Issued On</span>
+        <div class="text-text-800 font-medium">
+          {{ certificate.validFrom | date : "mediumDate" }}
+        </div>
+
+        <span class="text-sm text-text-600">Expires On</span>
+        <div class="text-text-800 font-medium">
+          {{ certificate.validTo | date : "mediumDate" }}
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURE -->
+    <div *ngIf="certificate">
+      <h3 class="text-xl font-semibold text-text-800 mb-4">
+        SHA-256 Fingerprints
+      </h3>
+      <div class="grid grid-cols-2 gap-y-2">
+        <span class="text-sm text-text-600">Certificate</span>
+        <div class="text-text-800 font-medium break-all">
+          {{ certificate.certificateKey }}
+        </div>
+
+        <span class="text-sm text-text-600">Public Key</span>
+        <div class="text-text-800 font-medium break-all">
+          {{ certificate.publicKey }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Download dugme -->
+<div *ngIf="isDownloadEnable()" class="flex justify-center mt-4">
+  <button
+    class="bg-secondary-800 hover:bg-secondary-400 text-white px-4 py-2 rounded transition-colors duration-200"
+    (click)="downloadCertificate()"
+  >
+    Download Certificate
+  </button>
+</div>

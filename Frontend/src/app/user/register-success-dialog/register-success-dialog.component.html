@@ -1,0 +1,38 @@
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-primary-100 rounded-lg shadow-lg max-w-md w-full p-6">
+    <div class="flex items-center mb-4">
+      <svg
+        class="w-8 h-8 text-green-500 mr-2"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M12 0C5.371 0 0 5.371 0 12s5.371 12 12 12 12-5.371 12-12S18.629 0 12 0zm-1.2 17.4l-4.8-4.8 1.68-1.68 3.12 3.12 6.72-6.72L20.4 10.8l-9.6 9.6z"
+        />
+      </svg>
+      <h2 class="text-xl font-semibold">Registration Successful!</h2>
+    </div>
+    <p>
+      Welcome aboard, {{ registerResponse?.firstName }}
+      {{ registerResponse?.lastName }}! Please check your email at
+      <strong>{{ registerResponse?.email }}</strong> to verify your account.
+    </p>
+    <div class="mt-6 flex justify-end space-x-2">
+      <button
+        (click)="goHome()"
+        class="px-4 py-2 border border-secondary-500 text-secondary-500 rounded hover:bg-secondary-100"
+      >
+        Go to Home
+      </button>
+      <button
+        (click)="login()"
+        class="px-4 py-2 bg-secondary-400 text-white rounded hover:bg-secondary-800"
+      >
+        Login
+      </button>
+    </div>
+  </div>
+</div>
