@@ -150,6 +150,7 @@ public class CertificateAuthority implements ICertificateAuthorityService {
                 .x500Name(intermediateX500Name)
                 .build();
         com.ftnteam11_2025.pki.pki_system.certificates.model.CertificateAuthority certificateAuthority = certificateAuthorityRepository.findById(requestDTO.getCertificateId()).orElseThrow(() -> new NotFoundError("RotCA not found"));
+        // ad
         Issuer issuer = certificateUtilsService.getIssuer(certificateAuthority, requestDTO.getOrganization());
 
         // 3. date
